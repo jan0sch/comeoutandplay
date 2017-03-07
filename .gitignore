@@ -1,26 +1,48 @@
-# Database files
-/.database
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+.elc
+auto-save-list
+tramp
 # Ensime
 .ensime
 .ensime_cache/
 .ensime*.log
-# Playframework
-logs
-project/project
-project/target
-target
-tmp
+# IntelliJ Idea
+*.iml
+*.ipr
+*.iws
+.idea/
+# Logfiles and rotated logfiles.
+*.log
+*.log.[0-9]*
+# MacOS
+*.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+# SBT
+target/
+lib_managed/
+src_managed/
+project/boot/
 .history
-dist
-/.idea
-/*.iml
-/out
-/.idea_modules
-/.classpath
-/.project
-/RUNNING_PID
-/.settings
-/.sass-cache
+.cache
 # Vim
 .*.sw[a-z]
 *.un~
