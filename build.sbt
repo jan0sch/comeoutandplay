@@ -10,14 +10,24 @@ lazy val frontend =
     .settings(
       compile in Compile := ((compile in Compile) dependsOn scalaJSPipeline).value,
       libraryDependencies ++= Seq(
+        library.akkaQuartz,
+        library.ficus,
+        library.guice,
+        library.playBootstrap,
+        library.playMailer,
+        library.playSil,
+        library.playSilBcrypt,
+        library.playSilPersist,
+        library.playSilJca,
         library.playSlick,
-        library.playSlickEvolutions,
+        library.playSlickEvo,
         library.postgresql,
         library.scalaJsScripts,
-        library.webjarsBootstrap,
         library.webjarsPlay,
         library.scalaCheck % Test,
-        library.scalaTest  % Test
+        library.scalaTest  % Test,
+        cache,
+        filters
       ),
       pipelineStages in Assets := Seq(scalaJSPipeline),
       pipelineStages := Seq(digest, gzip),
@@ -60,22 +70,36 @@ onLoad in Global := (Command.process("project frontend", _: State)) compose (onL
 lazy val library =
   new {
     object Version {
-      val bootstrap      = "3.3.7"
+      val akkaQuartz     = "1.5.0-akka-2.4.x"
+      val ficus          = "1.2.6"
+      val guice          = "4.0.1"
+      val playBootstrap  = "1.1.1-P25-B3-SNAPSHOT"
+      val playMailer     = "5.0.0"
+      val playSil        = "4.0.0"
       val playSlick      = "2.0.2"
       val postgresql     = "42.0.0"
       val scalaCheck     = "1.13.4"
-      val scalaJsScripts = "1.0.0"
+      val scalaJsScr     = "1.0.0"
       val scalaTest      = "3.0.1"
       val webjarsPlay    = "2.5.0-4"
     }
-    val playSlick           = "com.typesafe.play" %% "play-slick"              % Version.playSlick
-    val playSlickEvolutions = "com.typesafe.play" %% "play-slick-evolutions"   % Version.playSlick
-    val postgresql          = "org.postgresql"    %  "postgresql"              % Version.postgresql 
-    val scalaCheck          = "org.scalacheck"    %% "scalacheck"              % Version.scalaCheck
-    val scalaJsScripts      = "com.vmunier"       %% "scalajs-scripts"         % Version.scalaJsScripts
-    val scalaTest           = "org.scalatest"     %% "scalatest"               % Version.scalaTest
-    val webjarsBootstrap    = "org.webjars"       %  "bootstrap"               % Version.bootstrap
-    val webjarsPlay         = "org.webjars"       %% "webjars-play"            % Version.webjarsPlay
+    val akkaQuartz     = "com.enragedginger"  %% "akka-quartz-scheduler"            % Version.akkaQuartz
+    val ficus          = "com.iheart"         %% "ficus"                            % Version.ficus
+    val guice          = "net.codingwell"     %% "scala-guice"                      % Version.guice
+    val playBootstrap  = "com.adrianhurt"     %% "play-bootstrap"                   % Version.playBootstrap
+    val playMailer     = "com.typesafe.play"  %% "play-mailer"                      % Version.playMailer
+    val playSil        = "com.mohiva"         %% "play-silhouette"                  % Version.playSil
+    val playSilBcrypt  = "com.mohiva"         %% "play-silhouette-password-bcrypt"  % Version.playSil
+    val playSilPersist = "com.mohiva"         %% "play-silhouette-persistence"      % Version.playSil
+    val playSilJca     = "com.mohiva"         %% "play-silhouette-crypto-jca"       % Version.playSil
+    val playSilTestkit = "com.mohiva"         %% "play-silhouette-testkit"          % Version.playSil % "test"
+    val playSlick      = "com.typesafe.play"  %% "play-slick"                       % Version.playSlick
+    val playSlickEvo   = "com.typesafe.play"  %% "play-slick-evolutions"            % Version.playSlick
+    val postgresql     = "org.postgresql"     %  "postgresql"                       % Version.postgresql
+    val scalaCheck     = "org.scalacheck"     %% "scalacheck"                       % Version.scalaCheck
+    val scalaJsScripts = "com.vmunier"        %% "scalajs-scripts"                  % Version.scalaJsScr
+    val scalaTest      = "org.scalatest"      %% "scalatest"                        % Version.scalaTest
+    val webjarsPlay    = "org.webjars"        %% "webjars-play"                     % Version.webjarsPlay
   }
 
 // *****************************************************************************
@@ -85,7 +109,8 @@ lazy val library =
 lazy val settings =
   commonSettings ++
   gitSettings ++
-  headerSettings
+  headerSettings ++
+  resolverSettings
 
 lazy val commonSettings =
   Seq(
@@ -126,5 +151,12 @@ import de.heikoseeberger.sbtheader.license._
 lazy val headerSettings =
   Seq(
     headers := Map("scala" -> AGPLv3("2017", "Jens Grassel & André Schütz"))
+  )
+
+lazy val jcenter = Resolver.jcenterRepo
+lazy val sonatype = "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
+lazy val resolverSettings =
+  Seq(
+    externalResolvers := List(jcenter, sonatype)
   )
 
