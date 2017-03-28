@@ -18,6 +18,7 @@
 package models
 
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 /**
@@ -50,3 +51,13 @@ final case class FriendWithInfo(
     blocked: Option[UserBlocked],
     blockedMe: Option[UserBlocked]
 )
+
+object FriendWithInfo {
+  def formatTime(df: DateTimeFormatter)(f: FriendWithInfo): String = {
+    val ts = List(f.friend.map(_.created),
+                  f.request.map(_.created),
+                  f.blocked.map(_.created),
+                  f.user.created).flatten
+    ts.headOption.map(t => df.format(t)).getOrElse("")
+  }
+}

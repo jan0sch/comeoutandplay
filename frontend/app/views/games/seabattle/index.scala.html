@@ -1,0 +1,136 @@
+@(form: Form[CreateSeabattleGame], pageData: SeabattleStatusPage, user: models.User)(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil, assets: AssetsFinder)
+
+@myCss = {
+  <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/seabattle.css")">
+}
+
+@myScripts = {
+  <script type="text/javascript" src="@routes.Assets.versioned("javascripts/confirm.js")"></script>
+}
+
+@main(Messages("games.seabattle.index"), Some(user), customCss = myCss, customScripts = myScripts) {
+  <h2>@messages("games.seabattle.index")</h2>
+
+  <div id="alertContainer" style="position: absolute; z-index: 9999;">&#160;</div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="panel panel-info">
+        <div class="panel-heading">@messages("games.seabattle.new-game")</div>
+        <div class="panel-body">
+          @helper.form(action = routes.SeabattleController.create()) {
+            @helper.CSRF.formField
+            @form.globalError.map { error =>
+              <p class="alert alert-danger">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <span class="sr-only">Error:</span>
+                @error.message
+              </p>
+            }
+            <div class="form-group">
+              <label for="opponent">@messages("games.seabattle.new-game.opponent")</label>
+              <select id="opponent" name="opponent" class="form-control">
+                <option value="">@messages("games.seabattle.new-game.open-game")</option>
+                @for(f <- pageData.friends) {
+                  <option value="@f.user.userID.toString" @if(form("opponent").value.contains(f.user.userID.toString)) { selected="selected" }>@f.user.username</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <div><button id="submit" type="submit" value="submit" class="btn gtn-lg btn-success">@messages("games.seabattle.new-game")</button></div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="panel panel-info">
+        <div class="panel-heading">@messages("games.seabattle.active-games", pageData.running.size)</div>
+        <div class="panel-body">
+          <ol>
+          @for(s <- pageData.running) {
+            <li>
+              <span>@messages("games.seabattle.game.stats", s.ready.size, s.moves)</span>
+              @if(s.lastMove.nonEmpty) {
+                @if(s.lastMove.contains(user.userID)) {
+                  <span>@messages("games.seabattle.game.moves.waiting")</span>
+                }else{
+                  <span>@messages("games.seabattle.game.moves.yours")</span>
+                }
+              }
+              <a class="btn btn-info" href="@routes.SeabattleController.game(s.gameId)">@messages("games.seabattle.game.continue", s.gameId)</a>
+            </li>
+          }
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="panel panel-info">
+        <div class="panel-heading">@messages("games.seabattle.open-games", pageData.open.size)</div>
+        <div class="panel-body">
+        @if(pageData.open.nonEmpty) {
+          <div class="btn-group-vertical" role="group">
+          @for(s <- pageData.open) {
+            @helper.form(action = routes.SeabattleController.join(s.gameId)) {
+              @helper.CSRF.formField
+              <div class="form-group">
+                <span>@s.gameId</span>
+                <button id="submit" type="submit" value="submit" class="btn gtn-lg btn-success" data-confirm="@messages("games.seabattle.open-games.join.sure")">
+                  @messages("games.seabattle.open-games.join")
+                </button>
+              </div>
+            }
+          }
+          </div>
+        }else{
+          <p class="alert alert-info">@messages("games.seabattle.open-games.none")</p>
+        }
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      @defining(pageData.mine.filter(_.opponent.isEmpty)) { myOpen =>
+        <div class="panel panel-info">
+          <div class="panel-heading">@messages("games.seabattle.open-games.own", myOpen.size)</div>
+          <div class="panel-body">
+          @if(myOpen.nonEmpty) {
+            @for(o <- myOpen) {
+              @helper.form(action = routes.SeabattleController.destroy(o.gameId)) {
+                @helper.CSRF.formField
+                <div class="form-group">
+                  <span>@messages("games.seabattle.open-games.waiting")</span>
+                  <button id="@{o.gameId}-destroy" type="submit" value="submit" class="btn btn-danger" data-confirm="@messages("games.seabattle.open-games.destroy.sure")">
+                    @messages("games.seabattle.open-games.destroy")
+                  </button>
+                </div>
+              }
+            }
+          }else{
+            <p class="alert alert-info">@messages("games.seabattle.open-games.own.none")</p>
+          }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">@messages("games.seabattle.finished-games", pageData.completed.size)</div>
+        <div class="panel-body">
+          <ol>
+          @for(s <- pageData.completed) {
+            <li><a href="#">@s.gameId</a></li>
+          }
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+}

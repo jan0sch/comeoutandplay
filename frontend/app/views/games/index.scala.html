@@ -1,0 +1,16 @@
+@(user: models.User)(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil, assets: AssetsFinder)
+
+@main(Messages("games.index"), Some(user)) {
+  <h3>@messages("games.index")</h3>
+
+  <div id="alertContainer" style="position: absolute; z-index: 9999;">&#160;</div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">@messages("games.seabattle.index")</div>
+    <div class="panel-body">
+      <p>@messages("games.seabattle.description")</p>
+      <a href="@routes.SeabattleController.index" class="btn btn-success" title="@messages("games.seabattle.game.hint")">@messages("games.seabattle.game.play")</a>
+    </div>
+  </div>
+
+}

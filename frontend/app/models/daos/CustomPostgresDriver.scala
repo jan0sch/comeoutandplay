@@ -17,7 +17,7 @@
 
 package models.daos
 
-import com.github.tminglei.slickpg.{ ExPostgresProfile, PgDate2Support }
+import com.github.tminglei.slickpg.{ ExPostgresProfile, PgCirceJsonSupport, PgDate2Support }
 
 /**
   * To be able to use the postgresql extension for slick we have to
@@ -25,14 +25,16 @@ import com.github.tminglei.slickpg.{ ExPostgresProfile, PgDate2Support }
   *
   * @see https://github.com/tminglei/slick-pg
   */
-trait CustomPostgresDriver extends ExPostgresProfile with PgDate2Support {
+trait CustomPostgresDriver extends ExPostgresProfile with PgDate2Support with PgCirceJsonSupport {
+
+  def pgjson: String = "jsonb" // Use "JSONB" for PostgreSQL 9.4+
 
   // Add back `capabilities.insertOrUpdate` to enable native `upsert` support; for postgres 9.5+
   protected override def computeCapabilities: Set[slick.basic.Capability] =
     super.computeCapabilities + slick.jdbc.JdbcCapabilities.insertOrUpdate
 
   // Customise the api. Be sure to not add a type annotation to the overridden method.
-  override val api = new API with DateTimeImplicits {}
+  override val api = new API with DateTimeImplicits with CirceImplicits {}
 
 }
 

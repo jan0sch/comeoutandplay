@@ -23,6 +23,7 @@ import com.mohiva.play.silhouette.api.{ LogoutEvent, Silhouette }
 import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import play.api.routing._
 import utils.auth.DefaultEnv
 
 import scala.concurrent.Future
@@ -59,5 +60,15 @@ class ApplicationController @Inject()(components: ControllerComponents,
     val result = Redirect(routes.ApplicationController.index())
     silhouette.env.eventBus.publish(LogoutEvent(request.identity, request))
     silhouette.env.authenticatorService.discard(request.authenticator, result)
+  }
+
+  /**
+    * Generiert Routingdaten für die Nutzung seitens Javascript.
+    *
+    * @return Ein Javascript-Routing Objekt.
+    */
+  def javascriptRoutes: Action[AnyContent] = silhouette.SecuredAction.async { implicit request =>
+    val jsRoutes = JavaScriptReverseRouter("jsRoutes")(routes.javascript.SeabattleController.socket)
+    Future.successful(Ok(jsRoutes).as("text/javascript"))
   }
 }

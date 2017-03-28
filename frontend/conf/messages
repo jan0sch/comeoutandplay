@@ -106,6 +106,7 @@ nav.friends = Friends
 nav.home = Home
 nav.toggle.navigation = Toggle navigation
 nav.toggle.account = Account
+nav.games = Spiele
 
 # Password info
 strong.password.info = Strong passwords include numbers, letters and punctuation marks.
@@ -156,3 +157,51 @@ email.activate.account.subject = Activate account
 email.activate.account.hello = Hello {0},
 email.activate.account.html.text = Please follow <a href="{0}">this link</a> to confirm and activate your new account.
 email.activate.account.txt.text = Please follow the link to confirm and activate your new account: {0}
+
+#######
+# Games
+#######
+
+games.index = Spiele
+
+### Seabattle
+
+games.seabattle.active-games = Laufende Spiele ({0})
+games.seabattle.finished-games = Abgeschlossene Spiele ({0})
+games.seabattle.open-games = Offene Spiele ({0})
+games.seabattle.open-games.join = Dem Spiel beitreten.
+games.seabattle.open-games.join.failure = Du konntest dem Spiel nicht beitreten.
+games.seabattle.open-games.join.success = Du bist dem Spiel beigetreten.
+games.seabattle.open-games.join.sure = Bist Du sicher, daß Du dem Spiel beitreten möchtest?
+games.seabattle.open-games.none = Es gibt keine offenen Spiele.
+games.seabattle.open-games.own = Eigene offene Spiele ({0})
+games.seabattle.open-games.own.none = Du hast keine offene Spiele.
+games.seabattle.open-games.waiting = Noch kein Gegenspieler angetreten.
+games.seabattle.open-games.destroy = Spiel löschen
+games.seabattle.open-games.destroy.sure = Bist Du sicher? Diese Aktion kann nicht rückgängig gemacht werden!
+games.seabattle.new-game = Neues Spiel starten
+games.seabattle.new-game.open-game = Ein offenes Spiel erstellen.
+games.seabattle.new-game.opponent = Gegenspieler
+games.seabattle.index = Schiffe versenken
+games.seabattle.description = Schiffe versenken ist ein klassisches Spiel für zwei Spieler, bei dem versucht wird als erster alle Schiffe des Gegners zu versenken.
+games.seabattle.not-found = Das angeforderte Spiel wurde nicht gefunden!
+
+games.seabattle.game.board = Spielfeld
+games.seabattle.game.board.log = Meldungen
+games.seabattle.game.continue = Weiterspielen
+games.seabattle.game.enemyBoard = Gegnerisches Spielfeld
+games.seabattle.game.moves.waiting = Gegenspieler am Zug
+games.seabattle.game.moves.yours = Du bist am Zug!
+games.seabattle.game.no-opponent = Es gibt keinen Gegenspieler!
+games.seabattle.game.play = Schiffe versenken spielen
+games.seabattle.game.prepare = Vorbereitungsphase
+games.seabattle.game.prepare.clear = Spielfeld leeren.
+games.seabattle.game.prepare.clear.sure = Bist Du sicher, daß Du das Spielfeld leeren möchtest? Dieser Schritt kann nicht rückgängig gemacht werden.
+games.seabattle.game.prepare.help = Zum Setzen eines Schiffes auf das Spielfeld einfach das entsprechende Schiff auswählen und auf das Spielfeld klicken.
+games.seabattle.game.prepare.ready = Ich bin bereit.
+games.seabattle.game.prepare.ready.sure = Möchtest Du die Vorbereitungen wirklich abschließen? Dieser Schritt kann nicht rückgängig gemacht werden.
+games.seabattle.game.prepare.ships = Schiffe
+games.seabattle.game.prepare.shipyard = {0} (maximal {1}) - {2}
+games.seabattle.game.prepare.tools = Werkzeuge
+games.seabattle.game.prepare.wait = Warte auf Gegenspieler...
+games.seabattle.game.stats = {0} Spieler bereit, {1} Züge gespielt

@@ -21,6 +21,8 @@ import java.net.URLDecoder
 import java.util.UUID
 import javax.inject.Inject
 
+import cats.instances.string._
+import cats.syntax.eq._
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import models.services.{ AuthTokenService, UserService }
@@ -94,7 +96,7 @@ class ActivateAccountController @Inject()(components: ControllerComponents,
       authTokenService.validate(token).flatMap {
         case Some(authToken) =>
           userService.retrieve(authToken.userID).flatMap {
-            case Some(user) if user.loginInfo.providerID == CredentialsProvider.ID =>
+            case Some(user) if user.loginInfo.providerID === CredentialsProvider.ID =>
               userService.update(user.copy(activated = true)).map { _ =>
                 Redirect(routes.SignInController.view())
                   .flashing("success" -> Messages("account.activated"))
