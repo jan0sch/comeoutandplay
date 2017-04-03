@@ -13,6 +13,9 @@ POST        /signUp                   controllers.SignUpController.submit
 GET         /signIn                   controllers.SignInController.view
 POST        /signIn                   controllers.SignInController.submit
 
+GET         /destroyAccount           controllers.DestroyAccountController.destroyAccount
+GET         /destroy                  controllers.DestroyAccountController.destroy
+
 GET         /password/forgot          controllers.ForgotPasswordController.view
 POST        /password/forgot          controllers.ForgotPasswordController.submit
 GET         /password/reset/:token    controllers.ResetPasswordController.view(token: java.util.UUID)

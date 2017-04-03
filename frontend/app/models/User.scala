@@ -17,43 +17,58 @@
 
 package models
 
+import java.time.ZonedDateTime
 import java.util.UUID
 
+import com.mohiva.play.silhouette.api.util.PasswordInfo
 import com.mohiva.play.silhouette.api.{ Identity, LoginInfo }
+import com.mohiva.play.silhouette.impl.providers.{ OAuth1Info, OAuth2Info }
 
 /**
   * The user object.
   *
-  * @param userID The unique ID of the user.
-  * @param loginInfo The linked login info.
-  * @param firstName Maybe the first name of the authenticated user.
-  * @param lastName Maybe the last name of the authenticated user.
-  * @param fullName Maybe the full name of the authenticated user.
-  * @param email Maybe the email of the authenticated provider.
-  * @param avatarURL Maybe the avatar URL of the authenticated provider.
-  * @param activated Indicates that the user has activated its registration.
+  * @param userID       The unique ID of the user.
+  * @param loginInfo    Login information from silhouette to identify the user.
+  * @param email        The E-Mail address of the user.
+  * @param firstName    The first name of the user.
+  * @param lastName     The last name of the user.
+  * @param passwordInfo Password information of the user.
+  * @param oauth1Info   OAuth1 information when the user was authenticated with this method.
+  * @param oauth2Info   OAuth2 information when the user was authenticated with this method.
+  * @param avatarUrl    The Url of the user avatar.
+  * @param activated    Whether the account was activated.
+  * @param active       Whether the account is active.
+  * @param created      When the account was created.
+  * @param updated      When the account was updated.
   */
 case class User(userID: UUID,
                 loginInfo: LoginInfo,
+                email: Option[String],
                 firstName: Option[String],
                 lastName: Option[String],
-                fullName: Option[String],
-                email: Option[String],
-                avatarURL: Option[String],
-                activated: Boolean)
+                passwordInfo: PasswordInfo,
+                oauth1Info: OAuth1Info,
+                oauth2Info: OAuth2Info,
+                avatarUrl: Option[String],
+                activated: Boolean,
+                active: Boolean,
+                created: Option[ZonedDateTime],
+                updated: Option[ZonedDateTime],
+                admin: Boolean = false,
+                moderator: Boolean = false)
     extends Identity {
 
   /**
-    * Tries to construct a name.
+    * Construct a full name of the user.
     *
-    * @return Maybe a name.
+    * @return The full name of the user.
     */
-  def name = fullName.orElse {
+  def fullName(): Option[String] =
     firstName -> lastName match {
       case (Some(f), Some(l)) => Some(f + " " + l)
       case (Some(f), None)    => Some(f)
       case (None, Some(l))    => Some(l)
       case _                  => None
     }
-  }
+
 }

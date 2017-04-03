@@ -76,6 +76,9 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[UnsecuredErrorHandler].to[CustomUnsecuredErrorHandler]
     bind[SecuredErrorHandler].to[CustomSecuredErrorHandler]
     bind[UserService].to[UserServiceImpl]
+    bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDAO] // Bind to our PasswordInfo DAO
+    bind[DelegableAuthInfoDAO[OAuth1Info]].to[OAuth1InfoDao]     // Bind to our OAuth1 DAO
+    bind[DelegableAuthInfoDAO[OAuth2Info]].to[OAuth2InfoDao]     // Bind to our OAuth2 DAO
     bind[UserDAO].to[UserDAOImpl]
     bind[CacheLayer].to[PlayCacheLayer]
     bind[IDGenerator].toInstance(new SecureRandomIDGenerator())
@@ -85,9 +88,6 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[Clock].toInstance(Clock())
 
     // Replace this with the bindings to your concrete DAOs
-    bind[DelegableAuthInfoDAO[PasswordInfo]].toInstance(new InMemoryAuthInfoDAO[PasswordInfo])
-    bind[DelegableAuthInfoDAO[OAuth1Info]].toInstance(new InMemoryAuthInfoDAO[OAuth1Info])
-    bind[DelegableAuthInfoDAO[OAuth2Info]].toInstance(new InMemoryAuthInfoDAO[OAuth2Info])
     bind[DelegableAuthInfoDAO[OpenIDInfo]].toInstance(new InMemoryAuthInfoDAO[OpenIDInfo])
   }
 
@@ -123,31 +123,15 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     * Provides the social provider registry.
     *
     * @param facebookProvider The Facebook provider implementation.
-    * @param googleProvider The Google provider implementation.
-    * @param vkProvider The VK provider implementation.
-    * @param clefProvider The Clef provider implementation.
-    * @param twitterProvider The Twitter provider implementation.
-    * @param xingProvider The Xing provider implementation.
-    * @param yahooProvider The Yahoo provider implementation.
     * @return The Silhouette environment.
     */
   @Provides
-  def provideSocialProviderRegistry(facebookProvider: FacebookProvider,
-                                    googleProvider: GoogleProvider,
-                                    vkProvider: VKProvider,
-                                    clefProvider: ClefProvider,
-                                    twitterProvider: TwitterProvider,
-                                    xingProvider: XingProvider,
-                                    yahooProvider: YahooProvider): SocialProviderRegistry =
+  def provideSocialProviderRegistry(
+      facebookProvider: FacebookProvider
+  ): SocialProviderRegistry =
     SocialProviderRegistry(
       Seq(
-        googleProvider,
-        facebookProvider,
-        twitterProvider,
-        vkProvider,
-        xingProvider,
-        yahooProvider,
-        clefProvider
+        facebookProvider
       )
     )
 

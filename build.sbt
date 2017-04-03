@@ -23,6 +23,8 @@ lazy val frontend =
         library.playSlickEvo,
         library.postgresql,
         library.scalaJsScripts,
+        library.slickPg,
+        library.slickPgDate,
         library.webjarsPlay,
         library.scalaCheck % Test,
         library.scalaTest  % Test,
@@ -81,25 +83,29 @@ lazy val library =
       val scalaCheck     = "1.13.4"
       val scalaJsScr     = "1.0.0"
       val scalaTest      = "3.0.1"
+      val slickPg        = "0.14.6"
       val webjarsPlay    = "2.5.0-4"
     }
-    val akkaQuartz     = "com.enragedginger"  %% "akka-quartz-scheduler"            % Version.akkaQuartz
-    val ficus          = "com.iheart"         %% "ficus"                            % Version.ficus
-    val guice          = "net.codingwell"     %% "scala-guice"                      % Version.guice
-    val playBootstrap  = "com.adrianhurt"     %% "play-bootstrap"                   % Version.playBootstrap
-    val playMailer     = "com.typesafe.play"  %% "play-mailer"                      % Version.playMailer
-    val playSil        = "com.mohiva"         %% "play-silhouette"                  % Version.playSil
-    val playSilBcrypt  = "com.mohiva"         %% "play-silhouette-password-bcrypt"  % Version.playSil
-    val playSilPersist = "com.mohiva"         %% "play-silhouette-persistence"      % Version.playSil
-    val playSilJca     = "com.mohiva"         %% "play-silhouette-crypto-jca"       % Version.playSil
-    val playSilTestkit = "com.mohiva"         %% "play-silhouette-testkit"          % Version.playSil % "test"
-    val playSlick      = "com.typesafe.play"  %% "play-slick"                       % Version.playSlick
-    val playSlickEvo   = "com.typesafe.play"  %% "play-slick-evolutions"            % Version.playSlick
-    val postgresql     = "org.postgresql"     %  "postgresql"                       % Version.postgresql
-    val scalaCheck     = "org.scalacheck"     %% "scalacheck"                       % Version.scalaCheck
-    val scalaJsScripts = "com.vmunier"        %% "scalajs-scripts"                  % Version.scalaJsScr
-    val scalaTest      = "org.scalatest"      %% "scalatest"                        % Version.scalaTest
-    val webjarsPlay    = "org.webjars"        %% "webjars-play"                     % Version.webjarsPlay
+
+    val akkaQuartz     = "com.enragedginger"   %% "akka-quartz-scheduler"            % Version.akkaQuartz
+    val ficus          = "com.iheart"          %% "ficus"                            % Version.ficus
+    val guice          = "net.codingwell"      %% "scala-guice"                      % Version.guice
+    val playBootstrap  = "com.adrianhurt"      %% "play-bootstrap"                   % Version.playBootstrap
+    val playMailer     = "com.typesafe.play"   %% "play-mailer"                      % Version.playMailer
+    val playSil        = "com.mohiva"          %% "play-silhouette"                  % Version.playSil
+    val playSilBcrypt  = "com.mohiva"          %% "play-silhouette-password-bcrypt"  % Version.playSil
+    val playSilPersist = "com.mohiva"          %% "play-silhouette-persistence"      % Version.playSil
+    val playSilJca     = "com.mohiva"          %% "play-silhouette-crypto-jca"       % Version.playSil
+    val playSilTestkit = "com.mohiva"          %% "play-silhouette-testkit"          % Version.playSil % "test"
+    val playSlick      = "com.typesafe.play"   %% "play-slick"                       % Version.playSlick
+    val playSlickEvo   = "com.typesafe.play"   %% "play-slick-evolutions"            % Version.playSlick
+    val postgresql     = "org.postgresql"      %  "postgresql"                       % Version.postgresql
+    val scalaCheck     = "org.scalacheck"      %% "scalacheck"                       % Version.scalaCheck
+    val scalaJsScripts = "com.vmunier"         %% "scalajs-scripts"                  % Version.scalaJsScr
+    val scalaTest      = "org.scalatest"       %% "scalatest"                        % Version.scalaTest
+    val slickPg        = "com.github.tminglei" %% "slick-pg"                         % Version.slickPg
+    val slickPgDate    = "com.github.tminglei" %% "slick-pg_date2"                   % Version.slickPg
+    val webjarsPlay    = "org.webjars"         %% "webjars-play"                     % Version.webjarsPlay
   }
 
 // *****************************************************************************

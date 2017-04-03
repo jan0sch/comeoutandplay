@@ -1,0 +1,8 @@
+@()(implicit request: RequestHeader, messages: Messages, webJarAssets: WebJarAssets)
+
+@main(Messages("destroy.account")) {
+  <h2>@messages("destroy.account.question")</h2>
+
+  <a class="btn btn-success" href="@routes.DestroyAccountController.destroy()">@messages("destroy.button.submit")</a>
+  <a class="btn btn-default" href="@routes.ApplicationController.index()">@messages("destroy.button.back")</a>
+}
