@@ -15,20 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package utils
+package models
 
-import javax.inject.Inject
-
-import play.api.http.HttpFilters
-import play.api.mvc.EssentialFilter
-import play.filters.csrf.CSRFFilter
-import play.filters.headers.SecurityHeadersFilter
+import java.time.ZonedDateTime
+import java.util.UUID
 
 /**
-  * Provides filters.
+  * This class describes the relation of an user and another user that has
+  * been blocked by this user.
+  *
+  * @param user         The UUID of the user that has blocked the other user.
+  * @param userBlocked  The UUID of the user that has been blocked.
+  * @param created      The time when the block was created.
   */
-class Filters @Inject()(csrfFilter: CSRFFilter, securityHeadersFilter: SecurityHeadersFilter)
-    extends HttpFilters {
-
-  override def filters: Seq[EssentialFilter] = Seq(csrfFilter, securityHeadersFilter)
-}
+final case class UserBlocked(
+    user: UUID,
+    userBlocked: UUID,
+    created: ZonedDateTime
+)

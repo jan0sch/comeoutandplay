@@ -1,76 +1,15 @@
-error.email = Valid email required
-error.required = This field is required
-invalid.credentials = Invalid credentials!
-access.denied = Access denied!
-could.not.authenticate = Could not authenticate with social provider! Please try again!
-
-home.title = Silhouette - Home
-sign.up.title = Silhouette - Sign Up
-sign.in.title = Silhouette - Sign In
-forgot.password.title = Silhouette - Forgot Password
-reset.password.title = Silhouette - Reset Password
-change.password.title = Silhouette - Change Password
-activate.account.title = Silhouette - Activate Account
-
-toggle.navigation = Toggle navigation
-welcome.signed.in = Welcome, you are now signed in!
-
-sign.up.account = Sign up for a new account
-sign.in.credentials = Sign in to your account
-
-error = Error!
-info = Info!
-success = Success!
-home = Home
-first.name = First name
-last.name = Last name
-full.name = Full name
-email = Email
-password = Password
-send = Send
-change = Change
-reset = Reset
-sign.up = Sign up
-sign.in = Sign in
-sign.out = Sign out
-sign.in.now = Sign in now
-sign.up.now = Sign up now
-already.a.member = Already a member?
-not.a.member = Not a member?
-forgot.your.password = Forgot your password?
-forgot.password = Forgot password
-reset.password = Reset password
-change.password = Change password
+# Activate account
 activate.account = Activate Account
-current.password = Current password
-new.password = New password
-
-remember.me = Remember my login on this computer
-or.use.social = Or use your existing account on one of the following services to sign in:
-forgot.password.info = Please enter your email address and we will send you an email with further instructions to reset your password.
-strong.password.info = Strong passwords include numbers, letters and punctuation marks.
-current.password.invalid = The entered password is invalid. Please enter the correct password!
 activate.account.text1 = You can''t log in yet. We previously sent an activation email to you at:
 activate.account.text2 = Please follow the instructions in that email to activate your account.
 activate.account.text3 = Click <a href="{0}">here</a> to send the activation email again.
+activate.account.title = Activate Account
 
-sign.up.email.sent = You''re almost done! We sent an activation mail to {0}. Please follow the instructions in the email to activate your account. If it doesn''t arrive, check your spam folder, or try to log in again to send another activation mail.
-activation.email.sent = We sent another activation email to you at {0}. It might take a few minutes for it to arrive; be sure to check your spam folder.
-reset.email.sent = We have sent you an email with further instructions to reset your password, on condition that the address was found in our system. If you do not receive an email within the next 5 minutes, then please recheck your entered email address and try it again.
-
-invalid.activation.link = The link isn't valid anymore! Please sign in to send the activation email again.
-invalid.reset.link = The link isn't valid anymore! Please request a new link to reset your password.
-
-password.reset = We have reset your password. You can now sign in with your credentials.
-account.activated = Your account is now activated! Please sign in to use your new account.
-password.changed = Your password has been changed.
-
-google = Google
-facebook = Facebook
-twitter = Twitter
-vk = VK
-xing = Xing
-yahoo = Yahoo
+# Change password
+change.current.password = Current password
+change.new.password = New password
+change.password = Change password
+change.password.title = Change password
 
 # Destroy Account
 destroy.account = Delete account
@@ -79,6 +18,114 @@ destroy.account.error = Account could not be deleted.
 destroy.account.success = Account successfully removed.
 destroy.button.submit = Delete
 destroy.button.back = Back
+
+# Forgot password
+forgot.password = Forgot password
+forgot.password.info = Please enter your email address and we will send you an email with further instructions to reset your password.
+forgot.password.title = Forgot Password
+
+#friends
+friends = Friends
+friends.blocked.empty = No users blocked.
+friends.block.error = The user could not be blocked.
+friends.block.success = User successfully blocked.
+friends.block.user = Block user
+friends.destroy.button = Destroy
+friends.destroy.error = The friendship was not destroyed.
+friends.destroy.success = Friendship ended successfully.
+friends.friend.end = End friendship
+friends.listing.actions = Actions
+friends.listing.created = Since
+friends.listing.empty = No users found.
+friends.listing.status = Status
+friends.listing.username = Username
+friends.my-requests = Friendship requests
+friends.my-requests.button.accept = Accept
+friends.my-requests.error = Could not accept the friendship request.
+friends.my-requests.success = Friendship request accepted.
+friends.my.empty = No friends found.
+friends.nav.blocked = Blocked
+friends.nav.my = My friends
+friends.nav.requests = Open requests
+friends.nav.search = Search
+friends.request.abort = Abort request
+friends.request.error = The friend request failed.
+friends.request.success = Friend request successfully made.
+friends.request-destroy.error = The friend request could not be destroyed.
+friends.request-destroy.success = Friend request successfully destroyed.
+friends.requests.empty = No open requests.
+friends.status.isBlocked = Blocked
+friends.status.isFriend = Friend
+friends.status.isPossibility = Make friend request
+friends.status.isRequested = Request pending
+friends.title = Administer your friends
+friends.unblock.error = The user could not be unblocked.
+friends.unblock.success = User successfully unblocked.
+friends.unblock.user = Unblock user
+
+# General
+change = Change
+email = Email
+error = Error!
+info = Info!
+password = Password
+reset = Reset
+send = Send
+sign.up = Sign up
+sign.in = Sign in
+sign.out = Sign out
+sign.in.now = Sign in now
+sign.up.now = Sign up now
+success = Success!
+username = Username
+
+# Home
+home.created = Since
+home.title = Home
+home.signed.in = Welcome, you are now signed in!
+
+# Messages
+access.denied = Access denied!
+account.activated = Your account is now activated! Please sign in to use your new account.
+activation.email.sent = We sent another activation email to you at {0}. It might take a few minutes for it to arrive; be sure to check your spam folder.
+could.not.authenticate = Could not authenticate with social provider! Please try again!
+current.password.invalid = The entered password is invalid. Please enter the correct password!
+error.email = Valid email required
+error.required = This field is required
+invalid.activation.link = The link isn't valid anymore! Please sign in to send the activation email again.
+invalid.credentials = Username / password combination not valid or user does not exist!
+invalid.reset.link = The link isn't valid anymore! Please request a new link to reset your password.
+password.changed = Your password has been changed.
+password.reset = We have reset your password. You can now sign in with your credentials.
+reset.email.sent = We have sent you an email with further instructions to reset your password, on condition that the address was found in our system. If you do not receive an email within the next 5 minutes, then please recheck your entered email address and try it again.
+sign.up.email.sent = You're almost done! We sent an activation mail to {0}. Please follow the instructions in the email to activate your account. If it doesn''t arrive, check your spam folder, or try to log in again to send another activation mail.
+
+# Navigation
+nav.change.password = Change password
+nav.friends = Friends
+nav.home = Home
+nav.toggle.navigation = Toggle navigation
+nav.toggle.account = Account
+
+# Password info
+strong.password.info = Strong passwords include numbers, letters and punctuation marks.
+
+# Reset password
+reset.password = Reset password
+reset.password.title = Reset Password
+
+# Signin
+sign.in.credentials = Sign in to your account
+sign.in.forgot.password = Forgot your password?
+sign.in.not.member = Not a member?
+sign.in.or.use.social = Or use your existing account on one of the following services to sign in:
+sign.in.remember.me = Remember my login on this computer
+sign.in.title = Sign In
+
+# Signup
+sign.up.account = Sign up for a new account
+sign.up.already.member = Already a member?
+sign.up.title = Sign Up
 
 ##########
 # Emails

@@ -1,0 +1,21 @@
+@(users: Seq[FriendWithInfo])(implicit messages: Messages)
+
+@import views.html.friends.snippets.friendsActions
+@import views.html.friends.snippets.timeFormatter
+
+<table class="table table-responsive table-hover user-listing-table">
+  <thead>
+    <tr>
+      <th>@messages("friends.listing.username")</th>
+      <th>@messages("friends.listing.created")</th>
+      <th>@messages("friends.listing.actions")</th>
+    </tr>
+  </thead>
+  @for(user <- users) {
+  <tr>
+    <td class="col-md-8">@user.user.username</td>
+    <td class="col-md-2">@timeFormatter(user)</td>
+    <td class="col-md-2">@friendsActions(user)</td>
+  </tr>
+  }
+</table>

@@ -1,0 +1,24 @@
+@(user: FriendWithInfo)(implicit messages: Messages)
+
+@defining("dd.MM.yyyy - hh:mm") { dateTimeFormat =>
+  @defining((user.user, user.friend, user.request, user.blocked, user.blockedMe)) {
+    case (u, Some(f), _, _, _) => {
+      @{
+        java.time.format.DateTimeFormatter.ofPattern(dateTimeFormat).format(f.created)
+      }
+    }
+    case (u, _, Some(f), _, _) => {
+      @{
+        java.time.format.DateTimeFormatter.ofPattern(dateTimeFormat).format(f.created)
+      }
+    }
+    case (u, _, _, Some(f), _) => {
+      @{
+        java.time.format.DateTimeFormatter.ofPattern(dateTimeFormat).format(f.created)
+      }
+    }
+    case (u, _, _, _, _) => {
+      @u.created.fold("")(time => java.time.format.DateTimeFormatter.ofPattern(dateTimeFormat).format(time))
+    }
+  }
+}

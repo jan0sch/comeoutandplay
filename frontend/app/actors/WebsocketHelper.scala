@@ -15,20 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package utils
+package actors
 
-import javax.inject.Inject
-
-import play.api.http.HttpFilters
-import play.api.mvc.EssentialFilter
-import play.filters.csrf.CSRFFilter
-import play.filters.headers.SecurityHeadersFilter
+import play.twirl.api.Html
 
 /**
-  * Provides filters.
+  * Helper methods for websockets.
   */
-class Filters @Inject()(csrfFilter: CSRFFilter, securityHeadersFilter: SecurityHeadersFilter)
-    extends HttpFilters {
+trait WebsocketHelper {
 
-  override def filters: Seq[EssentialFilter] = Seq(csrfFilter, securityHeadersFilter)
+  /**
+    * Helper method that removes any characters from the Html
+    * representation that would lead to problems when sending via
+    * JSON to the client.
+    *
+    * @param html The Html that must be cleaned.
+    * @return The cleaned Html as String.
+    */
+  def cleanHtmlTemplate(html: Html): String =
+    html
+      .toString()
+      .replaceAll("\"", "'")
+      .split('\n')
+      .map(e ⇒ e.toString.trim.filter(_ >= ' '))
+      .mkString
+
 }

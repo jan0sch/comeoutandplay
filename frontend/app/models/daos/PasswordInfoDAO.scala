@@ -51,8 +51,10 @@ class PasswordInfoDAO @Inject()(userDAOImpl: UserDAOImpl)
     * @param authInfo   The new password information for the associated account.
     * @return The updated PasswordInfo.
     */
-  override def add(loginInfo: LoginInfo, authInfo: PasswordInfo): Future[PasswordInfo] =
+  override def add(loginInfo: LoginInfo, authInfo: PasswordInfo): Future[PasswordInfo] = {
+    implicit val ec = play.api.libs.concurrent.Execution.Implicits.defaultContext
     userDAOImpl.savePasswordInfo(loginInfo, authInfo)
+  }
 
   /**
     * Update new password information for the related account described by
@@ -62,8 +64,10 @@ class PasswordInfoDAO @Inject()(userDAOImpl: UserDAOImpl)
     * @param authInfo   The new password information for the associated account.
     * @return The updated PasswordInfo.
     */
-  override def update(loginInfo: LoginInfo, authInfo: PasswordInfo): Future[PasswordInfo] =
+  override def update(loginInfo: LoginInfo, authInfo: PasswordInfo): Future[PasswordInfo] = {
+    implicit val ec = play.api.libs.concurrent.Execution.Implicits.defaultContext
     userDAOImpl.savePasswordInfo(loginInfo, authInfo)
+  }
 
   /**
     * Save a password information to the related account described by
@@ -73,8 +77,10 @@ class PasswordInfoDAO @Inject()(userDAOImpl: UserDAOImpl)
     * @param authInfo   The new password information for the associated account.
     * @return The updated PasswordInfo.
     */
-  override def save(loginInfo: LoginInfo, authInfo: PasswordInfo): Future[PasswordInfo] =
+  override def save(loginInfo: LoginInfo, authInfo: PasswordInfo): Future[PasswordInfo] = {
+    implicit val ec = play.api.libs.concurrent.Execution.Implicits.defaultContext
     userDAOImpl.savePasswordInfo(loginInfo, authInfo)
+  }
 
   /**
     * Remove a password information of an account that is described by the

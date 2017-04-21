@@ -1,0 +1,41 @@
+@(user: models.User)(implicit request: RequestHeader, messages: Messages, webJarAssets: WebJarAssets)
+
+@myCss = {
+  <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/friends.css")">
+
+}
+
+@myScripts = {
+  <script type="text/javascript" src="@routes.Assets.versioned("javascripts/websockets/friendsSearch.js")"></script>
+  <script type="text/javascript">
+    FriendsSearch.connect()
+  </script>
+}
+
+@main(Messages("friends.title"), Some(user), customScripts = myScripts, customCss = myCss) {
+  <h3>@messages("friends.title")</h3>
+
+  <div id="alertContainer" style="position: absolute; z-index: 9999;">&#160;</div>
+
+  <ul class="nav nav-tabs friends-search-nav">
+    <li role="presentation" class="active"><a onclick="FriendsSearch.clientRequest(ClientRequestShowFriends)" data-toggle="tab" href="#my">@messages("friends.nav.my")</a></li>
+    <li role="presentation"><a data-toggle="tab" href="#search">@messages("friends.nav.search")</a></li>
+    <li role="presentation"><a onclick="FriendsSearch.clientRequest(ClientRequestShowOpenRequests)" data-toggle="tab" href="#requests">@messages("friends.nav.requests")</a></li>
+    <li role="presentation"><a onclick="FriendsSearch.clientRequest(ClientRequestShowBlockedUsers)" data-toggle="tab" href="#blocked">@messages("friends.nav.blocked")</a></li>
+  </ul>
+
+  <div class="tab-content friends-tabs">
+    <div id="my" class="tab-pane fade in active">
+      @views.html.friends.my()
+    </div>
+    <div id="search" class="tab-pane fade">
+    @views.html.friends.search()
+    </div>
+    <div id="requests" class="tab-pane fade">
+    @views.html.friends.requests()
+    </div>
+    <div id="blocked" class="tab-pane fade">
+    @views.html.friends.blocked()
+    </div>
+  </div>
+}

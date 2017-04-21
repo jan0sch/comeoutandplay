@@ -80,9 +80,9 @@ lazy val library =
       val playSil        = "4.0.0"
       val playSlick      = "2.0.2"
       val postgresql     = "42.0.0"
-      val scalaCheck     = "1.13.4"
+      val scalaCheck     = "1.13.5"
       val scalaJsScr     = "1.0.0"
-      val scalaTest      = "3.0.1"
+      val scalaTest      = "3.0.3"
       val slickPg        = "0.14.6"
       val webjarsPlay    = "2.5.0-4"
     }
