@@ -55,4 +55,12 @@ trait UserService extends IdentityService[User] {
     * @return The user for whom the profile was saved.
     */
   def save(profile: CommonSocialProfile): Future[User]
+
+  /**
+    * Update the given user.
+    *
+    * @param user The user to update.
+    * @return If <0, the update was not successful.
+    */
+  def update(user: User): Future[Int]
 }

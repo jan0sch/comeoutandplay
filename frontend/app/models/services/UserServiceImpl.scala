@@ -17,11 +17,13 @@
 
 package models.services
 
+import java.time.ZonedDateTime
 import java.util.UUID
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.LoginInfo
-import com.mohiva.play.silhouette.impl.providers.CommonSocialProfile
+import com.mohiva.play.silhouette.api.util.PasswordInfo
+import com.mohiva.play.silhouette.impl.providers.{ CommonSocialProfile, OAuth1Info, OAuth2Info }
 import models.User
 import models.daos.UserDAO
 import play.api.libs.concurrent.Execution.Implicits._
@@ -70,27 +72,43 @@ class UserServiceImpl @Inject()(userDAO: UserDAO) extends UserService {
   def save(profile: CommonSocialProfile) =
     userDAO.find(profile.loginInfo).flatMap {
       case Some(user) => // Update user with profile
-        userDAO.save(
-          user.copy(
-            firstName = profile.firstName,
-            lastName = profile.lastName,
-            fullName = profile.fullName,
-            email = profile.email,
-            avatarURL = profile.avatarURL
+        userDAO
+          .update(
+            user.copy(
+              firstName = profile.firstName,
+              lastName = profile.lastName,
+              email = profile.email,
+              avatarUrl = profile.avatarURL
+            )
           )
-        )
+          .map { result =>
+            user
+          }
       case None => // Insert a new user
         userDAO.save(
           User(
             userID = UUID.randomUUID(),
             loginInfo = profile.loginInfo,
+            email = profile.email,
             firstName = profile.firstName,
             lastName = profile.lastName,
-            fullName = profile.fullName,
-            email = profile.email,
-            avatarURL = profile.avatarURL,
-            activated = true
+            passwordInfo = PasswordInfo("", "", None),
+            oauth1Info = OAuth1Info("", ""),
+            oauth2Info = OAuth2Info("", Option(""), Option(0), Option(""), None),
+            avatarUrl = profile.avatarURL,
+            activated = true,
+            active = true,
+            created = Some(ZonedDateTime.now),
+            updated = Some(ZonedDateTime.now)
           )
         )
     }
+
+  /**
+    * Update the given user.
+    *
+    * @param user The user to update.
+    * @return If <0, the update was not successful.
+    */
+  def update(user: User) = userDAO.update(user)
 }

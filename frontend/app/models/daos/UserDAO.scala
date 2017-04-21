@@ -52,4 +52,12 @@ trait UserDAO {
     * @return The saved user.
     */
   def save(user: User): Future[User]
+
+  /**
+    * Update a given user.
+    *
+    * @param user The user to update.
+    * @return An option to the updated user.
+    */
+  def update(user: User): Future[Int]
 }

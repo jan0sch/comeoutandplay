@@ -17,6 +17,7 @@
 
 package controllers
 
+import java.time.ZonedDateTime
 import java.util.UUID
 import javax.inject.Inject
 
@@ -101,16 +102,21 @@ class SignUpController @Inject()(val messagesApi: MessagesApi,
             val user = User(
               userID = UUID.randomUUID(),
               loginInfo = loginInfo,
+              email = Some(data.email),
               firstName = Some(data.firstName),
               lastName = Some(data.lastName),
-              fullName = Some(data.firstName + " " + data.lastName),
-              email = Some(data.email),
-              avatarURL = None,
-              activated = false
+              passwordInfo = authInfo,
+              oauth1Info = OAuth1Info("", ""),
+              oauth2Info = OAuth2Info("", Option(""), Option(0), Option(""), Option(Map.empty)),
+              avatarUrl = None,
+              activated = false,
+              active = true,
+              created = Some(ZonedDateTime.now()),
+              updated = Some(ZonedDateTime.now())
             )
             for {
               avatar    <- avatarService.retrieveURL(data.email)
-              user      <- userService.save(user.copy(avatarURL = avatar))
+              user      <- userService.save(user.copy(avatarUrl = avatar))
               authInfo  <- authInfoRepository.add(loginInfo, authInfo)
               authToken <- authTokenService.create(user.userID)
             } yield {

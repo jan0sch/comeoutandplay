@@ -29,19 +29,19 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="@routes.ApplicationController.index">Silhouette Seed Template</a>
+                    <a class="navbar-brand" href="@routes.ApplicationController.index">Games</a>
                 </div>
                 <nav class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
                         <li><a href="@routes.ApplicationController.index">@Messages("home")</a></li>
-                        <li><a href="https://github.com/mohiva/play-silhouette-seed">GitHub</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         @user.map { u =>
-                            <li><a href="@routes.ApplicationController.index">@u.name</a></li>
+                            <li><a href="@routes.ApplicationController.index">@u.fullName()</a></li>
                             @if(u.loginInfo.providerID == com.mohiva.play.silhouette.impl.providers.CredentialsProvider.ID) {
                                 <li><a href="@routes.ChangePasswordController.view">@Messages("change.password")</a></li>
                             }
+                            <li><a href="@routes.DestroyAccountController.destroyAccount">@Messages("destroy.account")</a></li>
                             <li><a href="@routes.ApplicationController.signOut">@Messages("sign.out")</a></li>
                         }.getOrElse {
                             <li><a href="@routes.SignInController.view">@Messages("sign.in")</a></li>

@@ -16,7 +16,7 @@ toggle.navigation = Toggle navigation
 welcome.signed.in = Welcome, you are now signed in!
 
 sign.up.account = Sign up for a new account
-sign.in.credentials = Sign in with your credentials
+sign.in.credentials = Sign in to your account
 
 error = Error!
 info = Info!
@@ -72,11 +72,19 @@ vk = VK
 xing = Xing
 yahoo = Yahoo
 
+# Destroy Account
+destroy.account = Delete account
+destroy.account.question = Do you really want to delete your account?
+destroy.account.error = Account could not be deleted.
+destroy.account.success = Account successfully removed.
+destroy.button.submit = Delete
+destroy.button.back = Back
+
 ##########
 # Emails
 ##########
 
-email.from = Silhouette <noreply@mohiva.com>
+email.from = Games <noreply@example.com>
 
 # Sign Up
 email.sign.up.subject = Welcome
