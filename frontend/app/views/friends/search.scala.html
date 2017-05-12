@@ -1,0 +1,10 @@
+@()(implicit messages: Messages)
+
+<div class="input-group">
+  <input autofocus class="input-sm form-control" onkeyup="FriendsSearch.startSearch()" type="text" name="friends-query" id="friends-query" placeholder="" value="">
+  <span class="input-group-btn">
+    <button class="btn-sm btn btn-warning" onclick="FriendsSearch.startSearch()"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+  </span>
+</div>
+
+<div id="searchListing"></div>

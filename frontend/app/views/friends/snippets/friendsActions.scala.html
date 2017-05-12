@@ -1,0 +1,54 @@
+@(user: FriendWithInfo)(implicit messages: Messages)
+
+@defining((user.user, user.friend, user.request, user.blocked, user.blockedMe)) {
+  case (u, Some(f), _, _, _) => {
+    @defining("'" + u.userID.toString.trim + "'") { uuid =>
+      <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          @messages("friends.status.isFriend") <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a href="#" onclick="FriendsSearch.clientRequest(ClientRequestDestroyFriendship, @uuid)">
+            <span class="glyphicon glyphicon-resize-full" aria-hidden="true"></span> @messages("friends.friend.end")</a>
+          </li>
+          <li><a href="#" onclick="FriendsSearch.clientRequest(ClientRequestBlockUser, @uuid)">
+            <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> @messages("friends.block.user")</a>
+          </li>
+        </ul>
+      </div>
+    }
+  }
+  case (u, _, Some(f), _, _) => {
+    @defining("'" + u.userID.toString.trim + "'") { uuid =>
+      <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          @messages("friends.status.isRequested") <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a href="#" onclick="FriendsSearch.clientRequest(ClientRequestDestroyFriendshipRequest, @uuid)">
+            <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> @messages("friends.request.abort")</a>
+          </li>
+        </ul>
+      </div>
+    }
+  }
+  case (u, _, _, Some(f), _) => {
+    @defining("'" + u.userID.toString.trim + "'") { uuid =>
+    <div class="btn-group" role="group">
+      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        @messages("friends.status.isBlocked") <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a href="#" onclick="FriendsSearch.clientRequest(ClientRequestUnblockUser, @uuid)">
+          <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span> @messages("friends.unblock.user")</a>
+        </li>
+      </ul>
+    </div>
+    }
+  }
+  case (u,_,_,_,_) => {
+    @defining("'" + u.userID.toString.trim + "'") { uuid =>
+    <button onclick="FriendsSearch.clientRequest(ClientRequestRequestFriendship, @uuid)" class="btn btn-success">@messages("friends.status.isPossibility")</button>
+    }
+  }
+}

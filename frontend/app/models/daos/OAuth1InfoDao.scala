@@ -52,8 +52,10 @@ class OAuth1InfoDao @Inject()(userDAOImpl: UserDAOImpl) extends DelegableAuthInf
     * @param authInfo   The OAuth1Info that should be addded.
     * @return Future of the added OAuth1Info.
     */
-  def add(loginInfo: LoginInfo, authInfo: OAuth1Info): Future[OAuth1Info] =
+  def add(loginInfo: LoginInfo, authInfo: OAuth1Info): Future[OAuth1Info] = {
+    implicit val ec = play.api.libs.concurrent.Execution.Implicits.defaultContext
     userDAOImpl.saveOAuth1Info(loginInfo, authInfo)
+  }
 
   /**
     * Update an OAuth1Info to the user account that is
@@ -63,8 +65,10 @@ class OAuth1InfoDao @Inject()(userDAOImpl: UserDAOImpl) extends DelegableAuthInf
     * @param authInfo   The OAuth1Info that should be updated.
     * @return Future of the updated OAuth1Info.
     */
-  def update(loginInfo: LoginInfo, authInfo: OAuth1Info): Future[OAuth1Info] =
+  def update(loginInfo: LoginInfo, authInfo: OAuth1Info): Future[OAuth1Info] = {
+    implicit val ec = play.api.libs.concurrent.Execution.Implicits.defaultContext
     userDAOImpl.saveOAuth1Info(loginInfo, authInfo)
+  }
 
   /**
     * Save an OAuth1Info to the user account that is
@@ -74,8 +78,10 @@ class OAuth1InfoDao @Inject()(userDAOImpl: UserDAOImpl) extends DelegableAuthInf
     * @param authInfo   The OAuth1Info that should be saved.
     * @return Future of the saved OAuth1Info.
     */
-  def save(loginInfo: LoginInfo, authInfo: OAuth1Info): Future[OAuth1Info] =
+  def save(loginInfo: LoginInfo, authInfo: OAuth1Info): Future[OAuth1Info] = {
+    implicit val ec = play.api.libs.concurrent.Execution.Implicits.defaultContext
     userDAOImpl.saveOAuth1Info(loginInfo, authInfo)
+  }
 
   def remove(loginInfo: LoginInfo): Future[Unit] = ???
 }

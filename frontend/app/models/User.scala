@@ -30,6 +30,7 @@ import com.mohiva.play.silhouette.impl.providers.{ OAuth1Info, OAuth2Info }
   * @param userID       The unique ID of the user.
   * @param loginInfo    Login information from silhouette to identify the user.
   * @param email        The E-Mail address of the user.
+  * @param username     Unique username of the user in the system.
   * @param firstName    The first name of the user.
   * @param lastName     The last name of the user.
   * @param passwordInfo Password information of the user.
@@ -41,21 +42,22 @@ import com.mohiva.play.silhouette.impl.providers.{ OAuth1Info, OAuth2Info }
   * @param created      When the account was created.
   * @param updated      When the account was updated.
   */
-case class User(userID: UUID,
-                loginInfo: LoginInfo,
-                email: Option[String],
-                firstName: Option[String],
-                lastName: Option[String],
-                passwordInfo: PasswordInfo,
-                oauth1Info: OAuth1Info,
-                oauth2Info: OAuth2Info,
-                avatarUrl: Option[String],
-                activated: Boolean,
-                active: Boolean,
-                created: Option[ZonedDateTime],
-                updated: Option[ZonedDateTime],
-                admin: Boolean = false,
-                moderator: Boolean = false)
+final case class User(userID: UUID,
+                      loginInfo: LoginInfo,
+                      email: Option[String],
+                      username: String,
+                      firstName: Option[String],
+                      lastName: Option[String],
+                      passwordInfo: PasswordInfo,
+                      oauth1Info: OAuth1Info,
+                      oauth2Info: OAuth2Info,
+                      avatarUrl: Option[String],
+                      activated: Boolean,
+                      active: Boolean,
+                      created: Option[ZonedDateTime],
+                      updated: Option[ZonedDateTime],
+                      admin: Boolean = false,
+                      moderator: Boolean = false)
     extends Identity {
 
   /**

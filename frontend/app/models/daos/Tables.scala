@@ -24,13 +24,16 @@ import javax.inject.Inject
 import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.api.util.PasswordInfo
 import com.mohiva.play.silhouette.impl.providers.{ OAuth1Info, OAuth2Info }
-import models.User
+import models.{ Friend, FriendRequest, User, UserBlocked }
 import play.api.Configuration
 import play.api.db.slick.{ DatabaseConfigProvider, HasDatabaseConfigProvider }
 import slick.lifted.ProvenShape
 
 /**
   * Table definitions for the available models.
+  *
+  * @param configuration      Configuration set.
+  * @param dbConfigProvider   The database configuration provider.
   */
 class Tables @Inject()(protected val configuration: Configuration,
                        protected val dbConfigProvider: DatabaseConfigProvider)
@@ -75,7 +78,7 @@ class Tables @Inject()(protected val configuration: Configuration,
   )
 
   /**
-    * Slick table definition for the stores table.
+    * Slick table definition for the users table.
     *
     * @param tag A Tag marks a specific row represented by an AbstractTable instance.
     */
@@ -84,6 +87,7 @@ class Tables @Inject()(protected val configuration: Configuration,
     def provider_id          = column[String]("provider_id")
     def provider_key         = column[String]("provider_key")
     def email                = column[String]("email")
+    def username             = column[String]("username")
     def firstname            = column[Option[String]]("firstname")
     def lastname             = column[Option[String]]("lastname")
     def hasher               = column[String]("hasher")
@@ -118,6 +122,7 @@ class Tables @Inject()(protected val configuration: Configuration,
       (user_id,
        loginInfo,
        email.?,
+       username,
        firstname,
        lastname,
        passwordInfo,
@@ -137,6 +142,96 @@ class Tables @Inject()(protected val configuration: Configuration,
   }
 
   // The actual table query on which operations can be performed.
-  val users = TableQuery[Users]
+  val users: TableQuery[Users] = TableQuery[Users]
+
+  /**
+    * Slick table definition for the friends table.
+    *
+    * @param tag A Tag marks a specific row represented by an AbstractTable instance.
+    */
+  class Friends(tag: Tag) extends Table[Friend](tag, "friends") {
+    def user       = column[UUID]("user")
+    def friend     = column[UUID]("friend")
+    def created_at = column[ZonedDateTime]("created_at")
+
+    def pk = primaryKey("friends_unique_user_friend", (user, friend))
+    def userFk =
+      foreignKey("friends_fk_user", user, users)(
+        _.user_id,
+        onDelete = ForeignKeyAction.Cascade,
+        onUpdate = ForeignKeyAction.Cascade
+      )
+    def friendFk =
+      foreignKey("friends_fk_friend", friend, users)(
+        _.user_id,
+        onDelete = ForeignKeyAction.Cascade,
+        onUpdate = ForeignKeyAction.Cascade
+      )
+
+    def * = (user, friend, created_at).shaped <> (Friend.tupled, Friend.unapply)
+  }
+
+  // The actual table query on which operations can be performed.
+  val friends: TableQuery[Friends] = TableQuery[Friends]
+
+  /**
+    * Slick table definition for the friend requests table.
+    *
+    * @param tag A Tag marks a specific row represented by an AbstractTable instance.
+    */
+  class FriendRequests(tag: Tag) extends Table[FriendRequest](tag, "friend_requests") {
+    def user       = column[UUID]("user")
+    def friend     = column[UUID]("friend")
+    def created_at = column[ZonedDateTime]("created_at")
+
+    def pk = primaryKey("friend_requests_unique_user_friend", (user, friend))
+    def userFk =
+      foreignKey("friend_requests_fk_user", user, users)(
+        _.user_id,
+        onDelete = ForeignKeyAction.Cascade,
+        onUpdate = ForeignKeyAction.Cascade
+      )
+    def friendFk =
+      foreignKey("friend_requests_fk_friend", friend, users)(
+        _.user_id,
+        onDelete = ForeignKeyAction.Cascade,
+        onUpdate = ForeignKeyAction.Cascade
+      )
+
+    def * = (user, friend, created_at).shaped <> (FriendRequest.tupled, FriendRequest.unapply)
+  }
+
+  // The actual table query on which operations can be performed.
+  val friendRequests: TableQuery[FriendRequests] = TableQuery[FriendRequests]
+
+  /**
+    * Slick table definition for the blocked users table.
+    *
+    * @param tag A Tag marks a specific row represented by an AbstractTable instance.
+    */
+  class UsersBlocked(tag: Tag) extends Table[UserBlocked](tag, "users_blocked") {
+    def user       = column[UUID]("user")
+    def blocked    = column[UUID]("blocked")
+    def created_at = column[ZonedDateTime]("created_at")
+
+    def pk = primaryKey("users_blocked_unique_user_blocked", (user, blocked))
+    def userFk =
+      foreignKey("users_blocked_fk_user", user, users)(
+        _.user_id,
+        onDelete = ForeignKeyAction.Cascade,
+        onUpdate = ForeignKeyAction.Cascade
+      )
+    def friendFk =
+      foreignKey("users_blocked_fk_blocked", blocked, users)(
+        _.user_id,
+        onDelete = ForeignKeyAction.Cascade,
+        onUpdate = ForeignKeyAction.Cascade
+      )
+
+    def * = (user, blocked, created_at).shaped <> (UserBlocked.tupled, UserBlocked.unapply)
+  }
+
+  // The actual table query on which operations can be performed.
+  val usersBlocked: TableQuery[UsersBlocked] = TableQuery[UsersBlocked]
 
 }

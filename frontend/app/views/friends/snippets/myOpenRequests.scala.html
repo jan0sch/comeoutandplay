@@ -1,0 +1,40 @@
+@(myOpenRequests: Seq[FriendWithInfo])(implicit messages: Messages)
+
+@import views.html.friends.snippets.timeFormatter
+
+<div id="openRequestsForMeContainer">
+  <b class="orfm-header">@messages("friends.my-requests")</b>
+
+  <table id="openRequestsForMe" class="table table-responsive table-hover user-listing-table">
+    <thead>
+      <tr>
+        <th>@messages("friends.listing.username")</th>
+        <th>@messages("friends.listing.created")</th>
+        <th>@messages("friends.listing.actions")</th>
+      </tr>
+    </thead>
+    @for(request <- myOpenRequests) {
+      <tr>
+        <td class="col-md-8">@request.user.username</td>
+        <td class="col-md-2">@timeFormatter(request)</td>
+        <td class="col-md-2">
+          @defining("'" + request.user.userID.toString.trim + "'") { uuid =>
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              @messages("friends.status.isRequested") <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="#" onclick="FriendsSearch.clientRequest(ClientRequestAcceptFriend, @uuid)">
+                <span class="glyphicon glyphicon-user" aria-hidden="true"></span> @messages("friends.my-requests.button.accept")</a>
+              </li>
+              <li><a href="#" onclick="FriendsSearch.clientRequest(ClientRequestBlockUser, @uuid)">
+                <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> @messages("friends.block.user")</a>
+              </li>
+            </ul>
+          </div>
+          }
+        </td>
+      </tr>
+    }
+  </table>
+</div>

@@ -1,0 +1,27 @@
+.friends-search-nav {
+  margin-bottom: 10px;
+}
+
+#openRequestsForMeContainer {
+  padding: 5px;
+  border: 1px dashed #ccc;
+  margin: 20px 0;
+
+  .orfm-header {
+    padding-left: 8px;
+  }
+}
+
+.user-listing-table {
+  tbody {
+    tr {
+      td {
+        vertical-align: middle;
+
+        button {
+          margin: 0;
+        }
+      }
+    }
+  }
+}

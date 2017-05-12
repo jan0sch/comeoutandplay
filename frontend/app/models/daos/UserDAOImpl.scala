@@ -27,7 +27,7 @@ import models.User
 import play.api.Configuration
 import play.api.db.slick.DatabaseConfigProvider
 
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
   * Give access to the user object.
@@ -80,23 +80,33 @@ class UserDAOImpl @Inject()(override protected val configuration: Configuration,
     dbConfig.db.run(users.filter(_.user_id === userID).result.headOption)
 
   /**
+    * Return the users that contain the given query in their `username`.
+    *
+    * @param query The query string that should be part of the `username`.
+    * @return Future of Seq of Users.
+    */
+  def findUsers(query: String): Future[Seq[User]] =
+    dbConfig.db.run(users.filter(_.username.toLowerCase.like(s"%${query.toLowerCase}%")).result)
+
+  /**
     * Return the OAuth1Info information for the user described for the
     * LoginInfo.
     *
     * @param loginInfo LoginInfo of the user account.
     * @return Optional OAuth1Info for the user account.
     */
-  def getOAuth1Info(loginInfo: LoginInfo): Future[Option[OAuth1Info]] = {
-    import play.api.libs.concurrent.Execution.Implicits.defaultContext
+  def getOAuth1Info(
+      loginInfo: LoginInfo
+  ): Future[Option[OAuth1Info]] =
     dbConfig.db.run(
       users
         .filter(
           u => u.provider_id === loginInfo.providerID && u.provider_key === loginInfo.providerKey
         )
+        .map(_.oAuth1Info)
         .result
-        .map(_.headOption.map(r => r.oauth1Info))
+        .headOption
     )
-  }
 
   /**
     * Return the OAuth2Info information for the user described for the
@@ -105,17 +115,18 @@ class UserDAOImpl @Inject()(override protected val configuration: Configuration,
     * @param loginInfo  LoginInfo of the user account.
     * @return Optional OAuth2Info for the user account.
     */
-  def getOAuth2Info(loginInfo: LoginInfo): Future[Option[OAuth2Info]] = {
-    import play.api.libs.concurrent.Execution.Implicits.defaultContext
+  def getOAuth2Info(
+      loginInfo: LoginInfo
+  ): Future[Option[OAuth2Info]] =
     dbConfig.db.run(
       users
         .filter(
           u => u.provider_id === loginInfo.providerID && u.provider_key === loginInfo.providerKey
         )
+        .map(_.oAuth2Info)
         .result
-        .map(_.headOption.map(r => r.oauth2Info))
+        .headOption
     )
-  }
 
   /**
     * Return the PasswordInfo for a user identified by the provided LoginInfo
@@ -123,17 +134,18 @@ class UserDAOImpl @Inject()(override protected val configuration: Configuration,
     * @param loginInfo  LoginInfo for the User account.
     * @return The associated PasswordInfo.
     */
-  def getPasswordInfo(loginInfo: LoginInfo): Future[Option[PasswordInfo]] = {
-    import play.api.libs.concurrent.Execution.Implicits.defaultContext
+  def getPasswordInfo(
+      loginInfo: LoginInfo
+  ): Future[Option[PasswordInfo]] =
     dbConfig.db.run(
       users
         .filter(
           u => u.provider_id === loginInfo.providerID && u.provider_key === loginInfo.providerKey
         )
+        .map(_.passwordInfo)
         .result
-        .map(_.headOption.map(r => r.passwordInfo))
+        .headOption
     )
-  }
 
   /**
     * Saves a user.
@@ -153,8 +165,8 @@ class UserDAOImpl @Inject()(override protected val configuration: Configuration,
     * @param auth1Info  The new OAuth1Info.
     * @return Future of the stored OAuth1Info.
     */
-  def saveOAuth1Info(loginInfo: LoginInfo, auth1Info: OAuth1Info): Future[OAuth1Info] = {
-    import play.api.libs.concurrent.Execution.Implicits.defaultContext
+  def saveOAuth1Info(loginInfo: LoginInfo,
+                     auth1Info: OAuth1Info)(implicit ec: ExecutionContext): Future[OAuth1Info] =
     for {
       user <- find(loginInfo)
       result <- {
@@ -165,7 +177,6 @@ class UserDAOImpl @Inject()(override protected val configuration: Configuration,
     } yield {
       result
     }
-  }
 
   /**
     * Save an OAuth2Info for the user account described by the provided LoginInfo.
@@ -174,8 +185,8 @@ class UserDAOImpl @Inject()(override protected val configuration: Configuration,
     * @param auth2Info  The new OAuth2Info.
     * @return Future of the stored OAuth2Info.
     */
-  def saveOAuth2Info(loginInfo: LoginInfo, auth2Info: OAuth2Info): Future[OAuth2Info] = {
-    import play.api.libs.concurrent.Execution.Implicits.defaultContext
+  def saveOAuth2Info(loginInfo: LoginInfo,
+                     auth2Info: OAuth2Info)(implicit ec: ExecutionContext): Future[OAuth2Info] =
     for {
       user <- find(loginInfo)
       result <- {
@@ -186,7 +197,6 @@ class UserDAOImpl @Inject()(override protected val configuration: Configuration,
     } yield {
       result
     }
-  }
 
   /**
     * Save a PasswordInfo for the user account described by the provided LoginInfo.
@@ -195,8 +205,9 @@ class UserDAOImpl @Inject()(override protected val configuration: Configuration,
     * @param authInfo   The new PasswordInfo.
     * @return Future of the stored PasswordInfo.
     */
-  def savePasswordInfo(loginInfo: LoginInfo, authInfo: PasswordInfo): Future[PasswordInfo] = {
-    import play.api.libs.concurrent.Execution.Implicits.defaultContext
+  def savePasswordInfo(loginInfo: LoginInfo, authInfo: PasswordInfo)(
+      implicit ec: ExecutionContext
+  ): Future[PasswordInfo] =
     for {
       user <- find(loginInfo)
       result <- {
@@ -207,7 +218,6 @@ class UserDAOImpl @Inject()(override protected val configuration: Configuration,
     } yield {
       result
     }
-  }
 
   /**
     * Update the given user.

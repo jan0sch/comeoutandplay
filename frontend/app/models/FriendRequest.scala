@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package utils
+package models
 
-import javax.inject.Inject
-
-import play.api.http.HttpFilters
-import play.api.mvc.EssentialFilter
-import play.filters.csrf.CSRFFilter
-import play.filters.headers.SecurityHeadersFilter
+import java.time.ZonedDateTime
+import java.util.UUID
 
 /**
-  * Provides filters.
+  * This class describes a friends request from one user to another.
+  *
+  * @param user     The user that received the friends request.
+  * @param friend   The user that has sent the friends request.
+  * @param created  When the friends request was submitted.
   */
-class Filters @Inject()(csrfFilter: CSRFFilter, securityHeadersFilter: SecurityHeadersFilter)
-    extends HttpFilters {
-
-  override def filters: Seq[EssentialFilter] = Seq(csrfFilter, securityHeadersFilter)
-}
+final case class FriendRequest(
+    user: UUID,
+    friend: UUID,
+    created: ZonedDateTime
+)

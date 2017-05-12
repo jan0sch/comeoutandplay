@@ -43,7 +43,7 @@ class UserServiceImpl @Inject()(userDAO: UserDAO) extends UserService {
     * @param id The ID to retrieve a user.
     * @return The retrieved user or None if no user could be retrieved for the given ID.
     */
-  def retrieve(id: UUID) = userDAO.find(id)
+  def retrieve(id: UUID): Future[Option[User]] = userDAO.find(id)
 
   /**
     * Retrieves a user that matches the specified login info.
@@ -59,7 +59,7 @@ class UserServiceImpl @Inject()(userDAO: UserDAO) extends UserService {
     * @param user The user to save.
     * @return The saved user.
     */
-  def save(user: User) = userDAO.save(user)
+  def save(user: User): Future[User] = userDAO.save(user)
 
   /**
     * Saves the social profile for a user.
@@ -69,12 +69,13 @@ class UserServiceImpl @Inject()(userDAO: UserDAO) extends UserService {
     * @param profile The social profile to save.
     * @return The user for whom the profile was saved.
     */
-  def save(profile: CommonSocialProfile) =
+  def save(profile: CommonSocialProfile): Future[User] =
     userDAO.find(profile.loginInfo).flatMap {
       case Some(user) => // Update user with profile
         userDAO
           .update(
             user.copy(
+              username = UserServiceImpl.getSocialUsername(profile),
               firstName = profile.firstName,
               lastName = profile.lastName,
               email = profile.email,
@@ -90,6 +91,7 @@ class UserServiceImpl @Inject()(userDAO: UserDAO) extends UserService {
             userID = UUID.randomUUID(),
             loginInfo = profile.loginInfo,
             email = profile.email,
+            username = UserServiceImpl.getSocialUsername(profile),
             firstName = profile.firstName,
             lastName = profile.lastName,
             passwordInfo = PasswordInfo("", "", None),
@@ -110,5 +112,28 @@ class UserServiceImpl @Inject()(userDAO: UserDAO) extends UserService {
     * @param user The user to update.
     * @return If <0, the update was not successful.
     */
-  def update(user: User) = userDAO.update(user)
+  def update(user: User): Future[Int] = userDAO.update(user)
+}
+
+object UserServiceImpl {
+
+  /**
+    * Determine a username for the user from the social profile.
+    * The username is created depending on the fields that have be submitted
+    * from the social provider.
+    *
+    * @param profile The social account profile.
+    * @return String of the username.
+    */
+  def getSocialUsername(profile: CommonSocialProfile): String =
+    profile.fullName.fold {
+      profile.email.fold {
+        "" // FIXME: Logic for automatic creation of unique username
+      } { email =>
+        email
+      }
+    } { fullname =>
+      fullname
+    }
+
 }
