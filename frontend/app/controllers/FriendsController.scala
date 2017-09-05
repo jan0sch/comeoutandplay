@@ -21,23 +21,22 @@ import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.Silhouette
 import models.services.UserService
-import play.api.i18n.{ I18nSupport, MessagesApi }
-import play.api.mvc.{ Action, AnyContent, Controller }
+import play.api.i18n.I18nSupport
+import play.api.mvc._
 import utils.auth.DefaultEnv
 
 /**
   * Administer the friends
   *
-  * @param messagesApi            The Play messages API.
   * @param silhouette             The Silhouette stack.
   * @param userService            The user service implementation.
-  * @param webJarAssets           The Webjar assets locator.
   */
-class FriendsController @Inject()(val messagesApi: MessagesApi,
+class FriendsController @Inject()(components: ControllerComponents,
                                   silhouette: Silhouette[DefaultEnv],
                                   userService: UserService,
-                                  implicit val webJarAssets: WebJarAssets)
-    extends Controller
+                                  implicit val webJarsUtil: org.webjars.play.WebJarsUtil,
+                                  implicit val assets: AssetsFinder)
+    extends AbstractController(components)
     with I18nSupport {
 
   /**

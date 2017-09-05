@@ -23,7 +23,7 @@ import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.api.util.PasswordInfo
 import com.mohiva.play.silhouette.persistence.daos.DelegableAuthInfoDAO
 
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
   * Data Access Object for the access of the password information that is associated with
@@ -31,7 +31,7 @@ import scala.concurrent.Future
   *
   * @param userDAOImpl Access to the user methods.
   */
-class PasswordInfoDAO @Inject()(userDAOImpl: UserDAOImpl)
+class PasswordInfoDAO @Inject()(userDAOImpl: UserDAOImpl, implicit val ec: ExecutionContext)
     extends DelegableAuthInfoDAO[PasswordInfo] {
 
   /**
@@ -51,10 +51,8 @@ class PasswordInfoDAO @Inject()(userDAOImpl: UserDAOImpl)
     * @param authInfo   The new password information for the associated account.
     * @return The updated PasswordInfo.
     */
-  override def add(loginInfo: LoginInfo, authInfo: PasswordInfo): Future[PasswordInfo] = {
-    implicit val ec = play.api.libs.concurrent.Execution.Implicits.defaultContext
+  override def add(loginInfo: LoginInfo, authInfo: PasswordInfo): Future[PasswordInfo] =
     userDAOImpl.savePasswordInfo(loginInfo, authInfo)
-  }
 
   /**
     * Update new password information for the related account described by
@@ -64,10 +62,8 @@ class PasswordInfoDAO @Inject()(userDAOImpl: UserDAOImpl)
     * @param authInfo   The new password information for the associated account.
     * @return The updated PasswordInfo.
     */
-  override def update(loginInfo: LoginInfo, authInfo: PasswordInfo): Future[PasswordInfo] = {
-    implicit val ec = play.api.libs.concurrent.Execution.Implicits.defaultContext
+  override def update(loginInfo: LoginInfo, authInfo: PasswordInfo): Future[PasswordInfo] =
     userDAOImpl.savePasswordInfo(loginInfo, authInfo)
-  }
 
   /**
     * Save a password information to the related account described by
@@ -77,10 +73,8 @@ class PasswordInfoDAO @Inject()(userDAOImpl: UserDAOImpl)
     * @param authInfo   The new password information for the associated account.
     * @return The updated PasswordInfo.
     */
-  override def save(loginInfo: LoginInfo, authInfo: PasswordInfo): Future[PasswordInfo] = {
-    implicit val ec = play.api.libs.concurrent.Execution.Implicits.defaultContext
+  override def save(loginInfo: LoginInfo, authInfo: PasswordInfo): Future[PasswordInfo] =
     userDAOImpl.savePasswordInfo(loginInfo, authInfo)
-  }
 
   /**
     * Remove a password information of an account that is described by the

@@ -23,7 +23,7 @@ import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.impl.providers.OAuth2Info
 import com.mohiva.play.silhouette.persistence.daos.DelegableAuthInfoDAO
 
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
   * Data access object for the access of the OAuth2Info that is
@@ -32,7 +32,8 @@ import scala.concurrent.Future
   *
   * @param userDAOImpl Injected implementation of the UserDAO
   */
-class OAuth2InfoDao @Inject()(userDAOImpl: UserDAOImpl) extends DelegableAuthInfoDAO[OAuth2Info] {
+class OAuth2InfoDao @Inject()(userDAOImpl: UserDAOImpl, implicit val ec: ExecutionContext)
+    extends DelegableAuthInfoDAO[OAuth2Info] {
 
   /**
     * Find an OAuth2Info for the associated user account that is
@@ -52,10 +53,8 @@ class OAuth2InfoDao @Inject()(userDAOImpl: UserDAOImpl) extends DelegableAuthInf
     * @param authInfo   The OAuth2Info that should be addded.
     * @return Future of the added OAuth2Info.
     */
-  def add(loginInfo: LoginInfo, authInfo: OAuth2Info): Future[OAuth2Info] = {
-    implicit val ec = play.api.libs.concurrent.Execution.Implicits.defaultContext
+  def add(loginInfo: LoginInfo, authInfo: OAuth2Info): Future[OAuth2Info] =
     userDAOImpl.saveOAuth2Info(loginInfo, authInfo)
-  }
 
   /**
     * Update an OAuth2Info to the user account that is
@@ -65,10 +64,8 @@ class OAuth2InfoDao @Inject()(userDAOImpl: UserDAOImpl) extends DelegableAuthInf
     * @param authInfo   The OAuth2Info that should be updated.
     * @return Future of the updated OAuth2Info.
     */
-  def update(loginInfo: LoginInfo, authInfo: OAuth2Info): Future[OAuth2Info] = {
-    implicit val ec = play.api.libs.concurrent.Execution.Implicits.defaultContext
+  def update(loginInfo: LoginInfo, authInfo: OAuth2Info): Future[OAuth2Info] =
     userDAOImpl.saveOAuth2Info(loginInfo, authInfo)
-  }
 
   /**
     * Save an OAuth2Info to the user account that is
@@ -78,10 +75,8 @@ class OAuth2InfoDao @Inject()(userDAOImpl: UserDAOImpl) extends DelegableAuthInf
     * @param authInfo   The OAuth2Info that should be saved.
     * @return Future of the saved OAuth2Info.
     */
-  def save(loginInfo: LoginInfo, authInfo: OAuth2Info): Future[OAuth2Info] = {
-    implicit val ec = play.api.libs.concurrent.Execution.Implicits.defaultContext
+  def save(loginInfo: LoginInfo, authInfo: OAuth2Info): Future[OAuth2Info] =
     userDAOImpl.saveOAuth2Info(loginInfo, authInfo)
-  }
 
   def remove(loginInfo: LoginInfo): Future[Unit] = ???
 }

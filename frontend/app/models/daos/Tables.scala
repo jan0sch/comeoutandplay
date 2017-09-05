@@ -39,7 +39,7 @@ class Tables @Inject()(protected val configuration: Configuration,
                        protected val dbConfigProvider: DatabaseConfigProvider)
     extends HasDatabaseConfigProvider[CustomPostgresDriver] {
 
-  import driver.api._
+  import profile.api._
 
   /**
     * Helper function that transforms the database rows of an OAuth2Info

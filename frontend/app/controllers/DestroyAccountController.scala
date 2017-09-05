@@ -22,28 +22,27 @@ import javax.inject.Inject
 import com.mohiva.play.silhouette.api.{ LogoutEvent, Silhouette }
 import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
 import models.daos.UserDAOImpl
-import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
-import play.api.mvc.Controller
+import play.api.i18n.{ I18nSupport, Messages }
+import play.api.mvc._
 import utils.auth.DefaultEnv
-import play.api.libs.concurrent.Execution.Implicits._
 
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
   * Controller for the removal of an account from the system.
   *
-  * @param messagesApi The Play messages API.
   * @param silhouette The Silhouette stack.
   * @param socialProviderRegistry The social provider registry.
   * @param userDAOImpl Implementation of the user DAO functionalities.
-  * @param webJarAssets The webjar assets implementation.
   */
-class DestroyAccountController @Inject()(val messagesApi: MessagesApi,
+class DestroyAccountController @Inject()(components: ControllerComponents,
                                          silhouette: Silhouette[DefaultEnv],
                                          socialProviderRegistry: SocialProviderRegistry,
                                          userDAOImpl: UserDAOImpl,
-                                         implicit val webJarAssets: WebJarAssets)
-    extends Controller
+                                         implicit val ec: ExecutionContext,
+                                         implicit val webJarsUtil: org.webjars.play.WebJarsUtil,
+                                         implicit val assets: AssetsFinder)
+    extends AbstractController(components)
     with I18nSupport {
 
   /**
@@ -51,7 +50,7 @@ class DestroyAccountController @Inject()(val messagesApi: MessagesApi,
     *
     * @return Action result
     */
-  def destroyAccount = silhouette.SecuredAction.async { implicit request =>
+  def destroyAccount: Action[AnyContent] = silhouette.SecuredAction.async { implicit request =>
     Future.successful(Ok(views.html.destroyAccount()))
   }
 
@@ -60,7 +59,7 @@ class DestroyAccountController @Inject()(val messagesApi: MessagesApi,
     *
     * @return The result to display.
     */
-  def destroy = silhouette.SecuredAction.async { implicit request =>
+  def destroy: Action[AnyContent] = silhouette.SecuredAction.async { implicit request =>
     userDAOImpl.destroy(request.identity.loginInfo).flatMap { result =>
       if (result < 1) {
         Future.successful(

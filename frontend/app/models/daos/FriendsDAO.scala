@@ -33,7 +33,7 @@ class FriendsDAO @Inject()(override protected val configuration: Configuration,
                            override protected val dbConfigProvider: DatabaseConfigProvider)
     extends Tables(configuration, dbConfigProvider) {
 
-  import driver.api._
+  import profile.api._
 
   /**
     * Block a user.

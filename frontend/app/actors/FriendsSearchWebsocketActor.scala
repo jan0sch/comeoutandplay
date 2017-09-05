@@ -25,10 +25,10 @@ import actors.FriendsSearchWebsocketActor._
 import akka.actor.{ Actor, ActorLogging, ActorRef, Props }
 import models._
 import models.daos.FriendsDAO
-import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
+import play.api.i18n._
 import play.api.libs.json.{ JsValue, Json }
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.Future
 
 /**
   * WebSocket that connects the client with the backend for requests regarding
@@ -38,7 +38,8 @@ import scala.concurrent.{ ExecutionContext, Future }
   * @param user       The user that is signed into the system.
   * @param friendsDAO The friendsDAO for access to the database.
   */
-class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
+class FriendsSearchWebsocketActor(langs: Langs,
+                                  val messagesApi: MessagesApi,
                                   out: ActorRef,
                                   user: User,
                                   friendsDAO: FriendsDAO)
@@ -47,6 +48,9 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
     with I18nSupport
     with WebsocketHelper {
 
+  implicit val lang: Lang         = langs.availables.headOption.getOrElse(Lang("en"))
+  implicit val messages: Messages = MessagesImpl(lang, messagesApi)
+
   import context.dispatcher
 
   /**
@@ -54,6 +58,7 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
     *
     * @return Result
     */
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
   override def receive: Receive = {
 
     case json: JsValue =>
@@ -61,60 +66,59 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
       val typeOption = (json \ "type").toOption.getOrElse("").toString.replaceAll("\"", "").trim
       typeOption match {
         case ClientRequestUpdatePages =>
-          for {
-            result <- updatePages
+          val _ = for {
+            result <- updatePages()
           } yield out ! result
         case ClientRequestAcceptFriend =>
-          for {
+          val _ = for {
             result <- acceptFriend(json)
           } yield out ! result
         // Block a specific user
         case ClientRequestBlockUser =>
-          for {
+          val _ = for {
             result <- blockUser(json)
           } yield out ! result
         // Unblock a user
         case ClientRequestUnblockUser =>
-          for {
+          val _ = for {
             result <- unblockUser(json)
           } yield out ! result
         // Create a friend request
         case ClientRequestRequestFriendship =>
-          for {
+          val _ = for {
             result <- requestFriendship(json)
           } yield out ! result
         // Destroy a friendship connection
         case ClientRequestDestroyFriendship =>
-          for {
+          val _ = for {
             result <- destroyFriendship(json)
           } yield out ! result
         // Destroy a friends request connection
         case ClientRequestDestroyFriendshipRequest =>
-          for {
+          val _ = for {
             result <- destroyFriendshipRequest(json)
           } yield out ! result
         // Search for other users
         case ClientRequestStartSearch =>
-          for {
+          val _ = for {
             result <- startSearch(json)
           } yield out ! result
         // Show the list of blocked users
         case ClientRequestShowBlockedUsers =>
-          for {
-            result <- showBlockedUsers
+          val _ = for {
+            result <- showBlockedUsers()
           } yield out ! result
         // Show the list of own friends
         case ClientRequestShowFriends =>
-          for {
-            result <- showFriends
+          val _ = for {
+            result <- showFriends()
           } yield out ! result
         // Show the list of open friend requests
         case ClientRequestShowOpenRequests =>
-          for {
-            result <- showOpenRequests
+          val _ = for {
+            result <- showOpenRequests()
           } yield out ! result
       }
-
   }
 
   /**
@@ -122,7 +126,7 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
     *
     * @return Future of JsValue
     */
-  def showFriends(implicit ec: ExecutionContext): Future[JsValue] =
+  def showFriends(): Future[JsValue] =
     for {
       myOpenRequests <- friendsDAO.getMyOpenRequests(user)
       list           <- friendsDAO.getFriends(user)
@@ -133,27 +137,27 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
     *
     * @return Future of JsValue.
     */
-  def showOpenRequests(implicit ec: ExecutionContext): Future[JsValue] =
+  def showOpenRequests(): Future[JsValue] =
     for {
       list <- friendsDAO.getOpenRequests(user)
-    } yield createFriendsList(list, OpenRequestsPage)
+    } yield createFriendsList(list, OpenRequestsPage, Seq.empty)
 
   /**
     * Get the list of blocked users.
     *
     * @return Future of JsValue.
     */
-  def showBlockedUsers(implicit ec: ExecutionContext): Future[JsValue] =
+  def showBlockedUsers(): Future[JsValue] =
     for {
       list <- friendsDAO.getBlocked(user)
-    } yield createFriendsList(list, BlockedPage)
+    } yield createFriendsList(list, BlockedPage, Seq.empty)
 
   /**
     * Return the actual content for all pages.
     *
     * @return Future of JsValue with the content for all pages.
     */
-  def updatePages(implicit ec: ExecutionContext): Future[JsValue] =
+  def updatePages(): Future[JsValue] =
     for {
       myOpenRequests <- friendsDAO.getMyOpenRequests(user)
       friends        <- friendsDAO.getFriends(user)
@@ -164,8 +168,8 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
        {
        "type": "updatePagesResponse",
        "friends": "${createFriendsListHtml(friends, MyFriendsPage, myOpenRequests)}",
-       "openRequests": "${createFriendsListHtml(openRequests, OpenRequestsPage)}",
-       "blocked": "${createFriendsListHtml(blocked, BlockedPage)}"
+       "openRequests": "${createFriendsListHtml(openRequests, OpenRequestsPage, Seq.empty)}",
+       "blocked": "${createFriendsListHtml(blocked, BlockedPage, Seq.empty)}"
        }
       """)
     }
@@ -182,7 +186,7 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
 
     uuidOpt.fold(
       Future.successful(
-        createMessage("acceptFriendResponse", "danger", Messages("friends.my-requests.error"))
+        createMessage("acceptFriendResponse", "danger", messagesApi("friends.my-requests.error"))
       )
     ) { uuid =>
       for {
@@ -191,7 +195,9 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
         _ <- friendsDAO.createFriend(Friend(user.userID, uuid, ZonedDateTime.now()))
         _ <- friendsDAO.createFriend(Friend(uuid, user.userID, ZonedDateTime.now()))
       } yield {
-        createMessage("acceptFriendResponse", "success", Messages("friends.my-requests.success"))
+        createMessage("acceptFriendResponse",
+                      "success",
+                      messagesApi("friends.my-requests.success"))
       }
     }
   }
@@ -208,7 +214,7 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
 
     uuidOpt.fold(
       Future.successful(
-        createMessage("blockUserResponse", "danger", Messages("friends.block.error"))
+        createMessage("blockUserResponse", "danger", messagesApi("friends.block.error"))
       )
     ) { uuid =>
       for {
@@ -218,7 +224,7 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
         _ <- friendsDAO.destroyFriend(user.userID, uuid)
         _ <- friendsDAO.destroyFriend(uuid, user.userID)
       } yield {
-        createMessage("blockUserResponse", "success", Messages("friends.block.success"))
+        createMessage("blockUserResponse", "success", messagesApi("friends.block.success"))
       }
     }
   }
@@ -235,13 +241,13 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
 
     uuidOpt.fold(
       Future.successful(
-        createMessage("unblockUserResponse", "danger", Messages("friends.unblock.error"))
+        createMessage("unblockUserResponse", "danger", messagesApi("friends.unblock.error"))
       )
     ) { uuid =>
       for {
         _ <- friendsDAO.unblockUser(user, uuid)
       } yield {
-        createMessage("unblockUserResponse", "success", Messages("friends.unblock.success"))
+        createMessage("unblockUserResponse", "success", messagesApi("friends.unblock.success"))
       }
     }
   }
@@ -252,12 +258,12 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
     * @param json The request JSON.
     * @return Future of JsValue.
     */
-  def startSearch(json: JsValue)(implicit ec: ExecutionContext): Future[JsValue] = {
+  def startSearch(json: JsValue)(): Future[JsValue] = {
     val queryOption = (json \ "q").toOption
     val query       = queryOption.fold("")(r => r.as[String])
     for {
       list <- friendsDAO.searchFriends(user, query) if query.nonEmpty
-    } yield createFriendsList(list, SearchPage)
+    } yield createFriendsList(list, SearchPage, Seq.empty)
   }
 
   /**
@@ -273,17 +279,19 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
     for {
       result <- uuidOpt.fold(
         Future.successful(
-          createMessage("requestFriendshipResponse", "danger", Messages("friends.request.error"))
+          createMessage("requestFriendshipResponse",
+                        "danger",
+                        messagesApi("friends.request.error"))
         )
       ) { uuid =>
         val fr = FriendRequest(user.userID, uuid, ZonedDateTime.now())
         friendsDAO
           .createFriendRequest(fr)
           .map(
-            r =>
+            _ =>
               createMessage("requestFriendshipResponse",
                             "success",
-                            Messages("friends.request.success"))
+                            messagesApi("friends.request.success"))
           )
       }
     } yield result
@@ -303,7 +311,7 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
       Future.successful(
         createMessage("destroyFriendsRequestResponse",
                       "danger",
-                      Messages("friends.request-destroy.error"))
+                      messagesApi("friends.request-destroy.error"))
       )
     ) { uuid =>
       for {
@@ -312,7 +320,7 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
       } yield {
         createMessage("destroyFriendsRequestResponse",
                       "success",
-                      Messages("friends.request-destroy.success"))
+                      messagesApi("friends.request-destroy.success"))
       }
     }
   }
@@ -331,7 +339,7 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
       Future.successful(
         createMessage("destroyFriendshipRequestResponse",
                       "danger",
-                      Messages("friends.destroy.error"))
+                      messagesApi("friends.destroy.error"))
       )
     ) { uuid =>
       for {
@@ -340,7 +348,7 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
       } yield {
         createMessage("destroyFriendshipRequestResponse",
                       "success",
-                      Messages("friends.destroy.success"))
+                      messagesApi("friends.destroy.success"))
       }
     }
   }
@@ -370,15 +378,16 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
     * @param myOpenRequests   The open requests for friendship, if exists.
     * @return String
     */
+  @SuppressWarnings(Array("org.wartremover.warts.Throw"))
   def createFriendsListHtml(list: Seq[FriendWithInfo],
                             page: Page,
-                            myOpenRequests: Seq[FriendWithInfo] = Seq.empty): String = {
+                            myOpenRequests: Seq[FriendWithInfo]): String = {
     val emptyMessage =
       page match {
-        case BlockedPage      => Messages("friends.blocked.empty")
-        case OpenRequestsPage => Messages("friends.requests.empty")
-        case MyFriendsPage    => Messages("friends.my.empty")
-        case SearchPage       => Messages("friends.listing.empty")
+        case BlockedPage      => messagesApi("friends.blocked.empty")
+        case OpenRequestsPage => messagesApi("friends.requests.empty")
+        case MyFriendsPage    => messagesApi("friends.my.empty")
+        case SearchPage       => messagesApi("friends.listing.empty")
         case _                => throw new RuntimeException(s"Page type unknown: $page")
       }
 
@@ -404,9 +413,10 @@ class FriendsSearchWebsocketActor(val messagesApi: MessagesApi,
     * @param myOpenRequests Friendship requests that are open for the current user.
     * @return JsValue
     */
+  @SuppressWarnings(Array("org.wartremover.warts.Throw"))
   def createFriendsList(list: Seq[FriendWithInfo],
                         page: Page,
-                        myOpenRequests: Seq[FriendWithInfo] = Seq.empty): JsValue = {
+                        myOpenRequests: Seq[FriendWithInfo]): JsValue = {
     val typeString =
       page match {
         case BlockedPage      => "showBlockedUserResponse"
@@ -469,12 +479,17 @@ object FriendsSearchWebsocketActor {
   /**
     * A factory method to create the described actor.
     *
+    * @param langs        Available languages.
     * @param messagesApi  The Messages object.
     * @param out          The actor reference of the current actor.
     * @param user         The currently signed in user.
     * @param friendsDAO   The DAO to access the friends tables.
     * @return The properties needed to create the actor.
     */
-  def props(messagesApi: MessagesApi, out: ActorRef, user: User, friendsDAO: FriendsDAO) =
-    Props(new FriendsSearchWebsocketActor(messagesApi, out, user, friendsDAO))
+  def props(langs: Langs,
+            messagesApi: MessagesApi,
+            out: ActorRef,
+            user: User,
+            friendsDAO: FriendsDAO) =
+    Props(new FriendsSearchWebsocketActor(langs, messagesApi, out, user, friendsDAO))
 }

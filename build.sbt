@@ -5,7 +5,7 @@
 lazy val frontend =
   project
     .in(file("frontend"))
-    .enablePlugins(AutomateHeaderPlugin, GitVersioning, GitBranchPrompt, PlayScala)
+    .enablePlugins(AutomateHeaderPlugin, GitVersioning, GitBranchPrompt, PlayScala, SbtWeb)
     .settings(settings)
     .settings(
       compile in Compile := ((compile in Compile) dependsOn scalaJSPipeline).value,
@@ -15,6 +15,7 @@ lazy val frontend =
         library.guice,
         library.playBootstrap,
         library.playMailer,
+        library.playMailerGuice,
         library.playSil,
         library.playSilBcrypt,
         library.playSilPersist,
@@ -24,19 +25,22 @@ lazy val frontend =
         library.postgresql,
         library.scalaJsScripts,
         library.slickPg,
-        library.slickPgDate,
+        library.webjarsBoot,
         library.webjarsPlay,
         library.scalaCheck % Test,
         library.scalaTest  % Test,
-        cache,
-        filters
+        ehcache,
+        filters,
+        guice
       ),
       pipelineStages in Assets := Seq(scalaJSPipeline),
       pipelineStages := Seq(digest, gzip),
       scalaJSProjects := Seq(client),
       unmanagedSourceDirectories.in(Compile) := Seq(scalaSource.in(Compile).value),
       unmanagedSourceDirectories.in(Test) := Seq(scalaSource.in(Test).value),
-      wartremoverWarnings in (Compile, compile) ++= Warts.unsafe
+      wartremoverWarnings in (Compile, compile) ++= Warts.unsafe.filterNot(_ == Wart.DefaultArguments),
+      wartremoverExcluded += sourceDirectory.value / "conf" / "routes",
+      wartremoverExcluded ++= routes.in(Compile).value
     )
     .dependsOn(sharedJvm)
 
@@ -49,8 +53,8 @@ lazy val client =
       libraryDependencies ++= Seq(
         "org.scala-js" %%% "scalajs-dom" % "0.9.1"
       ),
-      persistLauncher := true,
-      persistLauncher in Test := false
+      scalaJSUseMainModuleInitializer := true,
+      scalaJSUseMainModuleInitializer in Test := false
     )
     .dependsOn(sharedJs)
 
@@ -72,19 +76,20 @@ onLoad in Global := (Command.process("project frontend", _: State)) compose (onL
 lazy val library =
   new {
     object Version {
-      val akkaQuartz     = "1.5.0-akka-2.4.x"
-      val ficus          = "1.2.6"
-      val guice          = "4.0.1"
-      val playBootstrap  = "1.1.1-P25-B3-SNAPSHOT"
-      val playMailer     = "5.0.0"
-      val playSil        = "4.0.0"
-      val playSlick      = "2.0.2"
+      val akkaQuartz     = "1.6.1-akka-2.5.x"
+      val ficus          = "1.4.2"
+      val guice          = "4.1.0"
+      val playBootstrap  = "1.2-P26-B3"
+      val playMailer     = "6.0.1"
+      val playSil        = "5.0.0"
+      val playSlick      = "3.0.2"
       val postgresql     = "42.0.0"
       val scalaCheck     = "1.13.5"
-      val scalaJsScr     = "1.0.0"
-      val scalaTest      = "3.0.3"
-      val slickPg        = "0.14.6"
-      val webjarsPlay    = "2.5.0-4"
+      val scalaJsScr     = "1.1.1"
+      val scalaTest      = "3.0.4"
+      val slickPg        = "0.15.3"
+      val webjarsBoot    = "3.3.7"
+      val webjarsPlay    = "2.6.2"
     }
 
     val akkaQuartz     = "com.enragedginger"   %% "akka-quartz-scheduler"            % Version.akkaQuartz
@@ -92,6 +97,7 @@ lazy val library =
     val guice          = "net.codingwell"      %% "scala-guice"                      % Version.guice
     val playBootstrap  = "com.adrianhurt"      %% "play-bootstrap"                   % Version.playBootstrap
     val playMailer     = "com.typesafe.play"   %% "play-mailer"                      % Version.playMailer
+    val playMailerGuice= "com.typesafe.play"   %% "play-mailer-guice"                % Version.playMailer
     val playSil        = "com.mohiva"          %% "play-silhouette"                  % Version.playSil
     val playSilBcrypt  = "com.mohiva"          %% "play-silhouette-password-bcrypt"  % Version.playSil
     val playSilPersist = "com.mohiva"          %% "play-silhouette-persistence"      % Version.playSil
@@ -104,7 +110,7 @@ lazy val library =
     val scalaJsScripts = "com.vmunier"         %% "scalajs-scripts"                  % Version.scalaJsScr
     val scalaTest      = "org.scalatest"       %% "scalatest"                        % Version.scalaTest
     val slickPg        = "com.github.tminglei" %% "slick-pg"                         % Version.slickPg
-    val slickPgDate    = "com.github.tminglei" %% "slick-pg_date2"                   % Version.slickPg
+    val webjarsBoot    = "org.webjars"         %  "bootstrap"                        % Version.webjarsBoot
     val webjarsPlay    = "org.webjars"         %% "webjars-play"                     % Version.webjarsPlay
   }
 
@@ -120,7 +126,7 @@ lazy val settings =
 
 lazy val commonSettings =
   Seq(
-    scalaVersion in ThisBuild := "2.11.8",
+    scalaVersion in ThisBuild := "2.12.3",
     organization := "de.hoshikuzu",
     licenses += ("AGPLv3",
                  url("https://www.gnu.org/licenses/agpl.html")),

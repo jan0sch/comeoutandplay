@@ -37,6 +37,7 @@ trait AuthTokenService {
     * @param expiry The duration a token expires.
     * @return The saved auth token.
     */
+  @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
   def create(userID: UUID, expiry: FiniteDuration = 5 minutes): Future[AuthToken]
 
   /**

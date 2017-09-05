@@ -29,18 +29,16 @@ import com.mohiva.play.silhouette.impl.providers._
 import forms.SignUpForm
 import models.User
 import models.services.{ AuthTokenService, UserService }
-import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
-import play.api.libs.concurrent.Execution.Implicits._
+import play.api.i18n.{ I18nSupport, Messages }
 import play.api.libs.mailer.{ Email, MailerClient }
-import play.api.mvc.Controller
+import play.api.mvc._
 import utils.auth.DefaultEnv
 
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
   * The `Sign Up` controller.
   *
-  * @param messagesApi            The Play messages API.
   * @param silhouette             The Silhouette stack.
   * @param userService            The user service implementation.
   * @param authInfoRepository     The auth info repository implementation.
@@ -48,9 +46,8 @@ import scala.concurrent.Future
   * @param avatarService          The avatar service implementation.
   * @param passwordHasherRegistry The password hasher registry.
   * @param mailerClient           The mailer client.
-  * @param webJarAssets           The webjar assets implementation.
   */
-class SignUpController @Inject()(val messagesApi: MessagesApi,
+class SignUpController @Inject()(components: ControllerComponents,
                                  silhouette: Silhouette[DefaultEnv],
                                  userService: UserService,
                                  authInfoRepository: AuthInfoRepository,
@@ -58,8 +55,10 @@ class SignUpController @Inject()(val messagesApi: MessagesApi,
                                  avatarService: AvatarService,
                                  passwordHasherRegistry: PasswordHasherRegistry,
                                  mailerClient: MailerClient,
-                                 implicit val webJarAssets: WebJarAssets)
-    extends Controller
+                                 implicit val ec: ExecutionContext,
+                                 implicit val webJarsUtil: org.webjars.play.WebJarsUtil,
+                                 implicit val assets: AssetsFinder)
+    extends AbstractController(components)
     with I18nSupport {
 
   /**
@@ -67,7 +66,7 @@ class SignUpController @Inject()(val messagesApi: MessagesApi,
     *
     * @return The result to display.
     */
-  def view = silhouette.UnsecuredAction.async { implicit request =>
+  def view: Action[AnyContent] = silhouette.UnsecuredAction.async { implicit request =>
     Future.successful(Ok(views.html.signUp(SignUpForm.form)))
   }
 
@@ -76,7 +75,7 @@ class SignUpController @Inject()(val messagesApi: MessagesApi,
     *
     * @return The result to display.
     */
-  def submit = silhouette.UnsecuredAction.async { implicit request =>
+  def submit: Action[AnyContent] = silhouette.UnsecuredAction.async { implicit request =>
     SignUpForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(views.html.signUp(form))),
       data => {
@@ -86,7 +85,7 @@ class SignUpController @Inject()(val messagesApi: MessagesApi,
         userService.retrieve(loginInfo).flatMap {
           case Some(user) =>
             val url = routes.SignInController.view().absoluteURL()
-            mailerClient.send(
+            val _ = mailerClient.send(
               Email(
                 subject = Messages("email.already.signed.up.subject"),
                 from = Messages("email.from"),
@@ -113,16 +112,18 @@ class SignUpController @Inject()(val messagesApi: MessagesApi,
               activated = false,
               active = true,
               created = Some(ZonedDateTime.now()),
-              updated = Some(ZonedDateTime.now())
+              updated = Some(ZonedDateTime.now()),
+              admin = false,
+              moderator = false
             )
             for {
               avatar    <- avatarService.retrieveURL(data.email)
               user      <- userService.save(user.copy(avatarUrl = avatar))
-              authInfo  <- authInfoRepository.add(loginInfo, authInfo)
+              _         <- authInfoRepository.add(loginInfo, authInfo)
               authToken <- authTokenService.create(user.userID)
             } yield {
               val url = routes.ActivateAccountController.activate(authToken.id).absoluteURL()
-              mailerClient.send(
+              val _ = mailerClient.send(
                 Email(
                   subject = Messages("email.sign.up.subject"),
                   from = Messages("email.from"),

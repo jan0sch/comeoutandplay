@@ -37,7 +37,7 @@ class UserDAOImpl @Inject()(override protected val configuration: Configuration,
     extends Tables(configuration, dbConfigProvider)
     with UserDAO {
 
-  import driver.api._
+  import profile.api._
 
   /**
     * Delete the account from the database.
@@ -171,7 +171,7 @@ class UserDAOImpl @Inject()(override protected val configuration: Configuration,
       user <- find(loginInfo)
       result <- {
         user.fold(Future.successful(auth1Info))(
-          u => update(u.copy(oauth1Info = auth1Info)).map(r => auth1Info)
+          u => update(u.copy(oauth1Info = auth1Info)).map(_ => auth1Info)
         )
       }
     } yield {
@@ -191,7 +191,7 @@ class UserDAOImpl @Inject()(override protected val configuration: Configuration,
       user <- find(loginInfo)
       result <- {
         user.fold(Future.successful(auth2Info))(
-          u => update(u.copy(oauth2Info = auth2Info)).map(r => auth2Info)
+          u => update(u.copy(oauth2Info = auth2Info)).map(_ => auth2Info)
         )
       }
     } yield {
@@ -212,7 +212,7 @@ class UserDAOImpl @Inject()(override protected val configuration: Configuration,
       user <- find(loginInfo)
       result <- {
         user.fold(Future.successful(authInfo))(
-          u => update(u.copy(passwordInfo = authInfo)).map(r => authInfo)
+          u => update(u.copy(passwordInfo = authInfo)).map(_ => authInfo)
         )
       }
     } yield {

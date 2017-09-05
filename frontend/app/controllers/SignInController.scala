@@ -30,19 +30,16 @@ import forms.SignInForm
 import models.services.UserService
 import net.ceedubs.ficus.Ficus._
 import play.api.Configuration
-import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
-import play.api.libs.concurrent.Execution.Implicits._
-import play.api.mvc.Controller
+import play.api.i18n.{ I18nSupport, Messages }
+import play.api.mvc._
 import utils.auth.DefaultEnv
 
-import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.language.postfixOps
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
   * The `Sign In` controller.
   *
-  * @param messagesApi The Play messages API.
   * @param silhouette The Silhouette stack.
   * @param userService The user service implementation.
   * @param authInfoRepository The auth info repository implementation.
@@ -50,9 +47,8 @@ import scala.language.postfixOps
   * @param socialProviderRegistry The social provider registry.
   * @param configuration The Play configuration.
   * @param clock The clock instance.
-  * @param webJarAssets The webjar assets implementation.
   */
-class SignInController @Inject()(val messagesApi: MessagesApi,
+class SignInController @Inject()(components: ControllerComponents,
                                  silhouette: Silhouette[DefaultEnv],
                                  userService: UserService,
                                  authInfoRepository: AuthInfoRepository,
@@ -60,8 +56,10 @@ class SignInController @Inject()(val messagesApi: MessagesApi,
                                  socialProviderRegistry: SocialProviderRegistry,
                                  configuration: Configuration,
                                  clock: Clock,
-                                 implicit val webJarAssets: WebJarAssets)
-    extends Controller
+                                 implicit val ec: ExecutionContext,
+                                 implicit val webJarsUtil: org.webjars.play.WebJarsUtil,
+                                 implicit val assets: AssetsFinder)
+    extends AbstractController(components)
     with I18nSupport {
 
   /**
@@ -69,7 +67,7 @@ class SignInController @Inject()(val messagesApi: MessagesApi,
     *
     * @return The result to display.
     */
-  def view = silhouette.UnsecuredAction.async { implicit request =>
+  def view: Action[AnyContent] = silhouette.UnsecuredAction.async { implicit request =>
     Future.successful(Ok(views.html.signIn(SignInForm.form, socialProviderRegistry)))
   }
 
@@ -78,7 +76,7 @@ class SignInController @Inject()(val messagesApi: MessagesApi,
     *
     * @return The result to display.
     */
-  def submit = silhouette.UnsecuredAction.async { implicit request =>
+  def submit: Action[AnyContent] = silhouette.UnsecuredAction.async { implicit request =>
     SignInForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(views.html.signIn(form, socialProviderRegistry))),
       data => {
