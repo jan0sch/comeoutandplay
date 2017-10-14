@@ -43,6 +43,7 @@ src_managed/
 project/boot/
 .history
 .cache
+.sass-cache
 # Vim
 .*.sw[a-z]
 *.un~

@@ -1,4 +1,4 @@
-@(user: models.User)(implicit request: RequestHeader, messages: Messages, webJarAssets: WebJarAssets)
+@(user: models.User)(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil, assets: AssetsFinder)
 
 @myCss = {
   <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/friends.css")">

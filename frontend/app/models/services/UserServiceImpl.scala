@@ -26,16 +26,16 @@ import com.mohiva.play.silhouette.api.util.PasswordInfo
 import com.mohiva.play.silhouette.impl.providers.{ CommonSocialProfile, OAuth1Info, OAuth2Info }
 import models.User
 import models.daos.UserDAO
-import play.api.libs.concurrent.Execution.Implicits._
 
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
   * Handles actions to users.
   *
   * @param userDAO The user DAO implementation.
   */
-class UserServiceImpl @Inject()(userDAO: UserDAO) extends UserService {
+class UserServiceImpl @Inject()(userDAO: UserDAO, implicit val ec: ExecutionContext)
+    extends UserService {
 
   /**
     * Retrieves a user that matches the specified ID.
@@ -82,7 +82,7 @@ class UserServiceImpl @Inject()(userDAO: UserDAO) extends UserService {
               avatarUrl = profile.avatarURL
             )
           )
-          .map { result =>
+          .map { _ =>
             user
           }
       case None => // Insert a new user
@@ -101,7 +101,9 @@ class UserServiceImpl @Inject()(userDAO: UserDAO) extends UserService {
             activated = true,
             active = true,
             created = Some(ZonedDateTime.now),
-            updated = Some(ZonedDateTime.now)
+            updated = Some(ZonedDateTime.now),
+            admin = false,
+            moderator = false
           )
         )
     }

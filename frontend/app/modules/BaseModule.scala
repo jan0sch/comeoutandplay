@@ -30,6 +30,7 @@ class BaseModule extends AbstractModule with ScalaModule {
   /**
     * Configures the module.
     */
+  @SuppressWarnings(Array("org.wartremover.warts.NonUnitStatements"))
   def configure(): Unit = {
     bind[AuthTokenDAO].to[AuthTokenDAOImpl]
     bind[AuthTokenService].to[AuthTokenServiceImpl]

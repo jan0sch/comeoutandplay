@@ -1,8 +1,8 @@
-@()(implicit request: RequestHeader, messages: Messages, webJarAssets: WebJarAssets)
+@()(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil, assets: AssetsFinder)
 
 @main(Messages("destroy.account")) {
-  <h2>@messages("destroy.account.question")</h2>
+  <h2>@Messages("destroy.account.question")</h2>
 
-  <a class="btn btn-success" href="@routes.DestroyAccountController.destroy()">@messages("destroy.button.submit")</a>
-  <a class="btn btn-default" href="@routes.ApplicationController.index()">@messages("destroy.button.back")</a>
+  <a class="btn btn-success" href="@routes.DestroyAccountController.destroy()">@Messages("destroy.button.submit")</a>
+  <a class="btn btn-default" href="@routes.ApplicationController.index()">@Messages("destroy.button.back")</a>
 }

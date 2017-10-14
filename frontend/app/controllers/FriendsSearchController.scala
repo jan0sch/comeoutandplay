@@ -24,13 +24,13 @@ import akka.actor.ActorSystem
 import akka.stream.Materializer
 import com.mohiva.play.silhouette.api.{ HandlerResult, Silhouette }
 import models.daos.FriendsDAO
-import play.api.i18n.MessagesApi
+import play.api.i18n.Langs
 import play.api.libs.json.JsValue
 import play.api.libs.streams.ActorFlow
-import play.api.mvc.{ AnyContentAsEmpty, Controller, Request, WebSocket }
+import play.api.mvc._
 import utils.auth.DefaultEnv
 
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
   * Special controller that defines a WebSocket for the exchange of
@@ -40,14 +40,15 @@ import scala.concurrent.Future
   * @param silhouette   Silhouette environment.
   * @param materializer The Materializer.
   * @param friendsDAO   The friendsDAO to get data access.
-  * @param messagesApi  Messages API for i18n.
   */
-class FriendsSearchController @Inject()(implicit system: ActorSystem,
-                                        silhouette: Silhouette[DefaultEnv],
-                                        materializer: Materializer,
-                                        friendsDAO: FriendsDAO,
-                                        val messagesApi: MessagesApi)
-    extends Controller {
+class FriendsSearchController @Inject()(components: ControllerComponents)(
+    implicit system: ActorSystem,
+    silhouette: Silhouette[DefaultEnv],
+    materializer: Materializer,
+    friendsDAO: FriendsDAO,
+    langs: Langs,
+    implicit val ec: ExecutionContext
+) extends AbstractController(components) {
 
   /**
     * * Specify the WebSocket with the accepted data types.
@@ -58,8 +59,7 @@ class FriendsSearchController @Inject()(implicit system: ActorSystem,
     * @return WebSocket
     */
   def socket: WebSocket = WebSocket.acceptOrResult[JsValue, JsValue] { implicit request =>
-    import play.api.libs.concurrent.Execution.Implicits.defaultContext
-    implicit val req = Request(request, AnyContentAsEmpty)
+    implicit val req: Request[AnyContentAsEmpty.type] = Request(request, AnyContentAsEmpty)
     silhouette
       .SecuredRequestHandler { securedRequest =>
         Future.successful(HandlerResult(Ok, Some(securedRequest.identity)))
@@ -68,7 +68,7 @@ class FriendsSearchController @Inject()(implicit system: ActorSystem,
         case HandlerResult(r, Some(user)) =>
           Right(
             ActorFlow.actorRef(
-              out => FriendsSearchWebsocketActor.props(messagesApi, out, user, friendsDAO)
+              out => FriendsSearchWebsocketActor.props(langs, messagesApi, out, user, friendsDAO)
             )
           )
         case HandlerResult(r, None) => Left(Forbidden)

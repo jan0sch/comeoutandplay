@@ -56,8 +56,8 @@ final case class User(userID: UUID,
                       active: Boolean,
                       created: Option[ZonedDateTime],
                       updated: Option[ZonedDateTime],
-                      admin: Boolean = false,
-                      moderator: Boolean = false)
+                      admin: Boolean,
+                      moderator: Boolean)
     extends Identity {
 
   /**

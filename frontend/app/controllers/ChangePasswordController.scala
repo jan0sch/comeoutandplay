@@ -26,32 +26,31 @@ import com.mohiva.play.silhouette.api.util.{ Credentials, PasswordHasherRegistry
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import forms.ChangePasswordForm
 import models.services.UserService
-import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
-import play.api.libs.concurrent.Execution.Implicits._
-import play.api.mvc.Controller
+import play.api.i18n.{ I18nSupport, Messages }
+import play.api.mvc._
 import utils.auth.{ DefaultEnv, WithProvider }
 
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
   * The `Change Password` controller.
   *
-  * @param messagesApi            The Play messages API.
   * @param silhouette             The Silhouette stack.
   * @param userService            The user service implementation.
   * @param credentialsProvider    The credentials provider.
   * @param authInfoRepository     The auth info repository.
   * @param passwordHasherRegistry The password hasher registry.
-  * @param webJarAssets           The WebJar assets locator.
   */
-class ChangePasswordController @Inject()(val messagesApi: MessagesApi,
+class ChangePasswordController @Inject()(components: ControllerComponents,
                                          silhouette: Silhouette[DefaultEnv],
                                          userService: UserService,
                                          credentialsProvider: CredentialsProvider,
                                          authInfoRepository: AuthInfoRepository,
                                          passwordHasherRegistry: PasswordHasherRegistry,
-                                         implicit val webJarAssets: WebJarAssets)
-    extends Controller
+                                         implicit val ec: ExecutionContext,
+                                         implicit val webJarsUtil: org.webjars.play.WebJarsUtil,
+                                         implicit val assets: AssetsFinder)
+    extends AbstractController(components)
     with I18nSupport {
 
   /**
@@ -59,38 +58,40 @@ class ChangePasswordController @Inject()(val messagesApi: MessagesApi,
     *
     * @return The result to display.
     */
-  def view = silhouette.SecuredAction(WithProvider[DefaultEnv#A](CredentialsProvider.ID)) {
-    implicit request =>
-      Ok(views.html.changePassword(ChangePasswordForm.form, request.identity))
-  }
+  def view: Action[AnyContent] =
+    silhouette.SecuredAction(WithProvider[DefaultEnv#A](CredentialsProvider.ID)) {
+      implicit request =>
+        Ok(views.html.changePassword(ChangePasswordForm.form, request.identity))
+    }
 
   /**
     * Changes the password.
     *
     * @return The result to display.
     */
-  def submit = silhouette.SecuredAction(WithProvider[DefaultEnv#A](CredentialsProvider.ID)).async {
-    implicit request =>
-      ChangePasswordForm.form.bindFromRequest.fold(
-        form => Future.successful(BadRequest(views.html.changePassword(form, request.identity))),
-        password => {
-          val (currentPassword, newPassword) = password
-          val credentials                    = Credentials(request.identity.email.getOrElse(""), currentPassword)
-          credentialsProvider
-            .authenticate(credentials)
-            .flatMap { loginInfo =>
-              val passwordInfo = passwordHasherRegistry.current.hash(newPassword)
-              authInfoRepository.update[PasswordInfo](loginInfo, passwordInfo).map { _ =>
-                Redirect(routes.ChangePasswordController.view())
-                  .flashing("success" -> Messages("password.changed"))
+  def submit: Action[AnyContent] =
+    silhouette.SecuredAction(WithProvider[DefaultEnv#A](CredentialsProvider.ID)).async {
+      implicit request =>
+        ChangePasswordForm.form.bindFromRequest.fold(
+          form => Future.successful(BadRequest(views.html.changePassword(form, request.identity))),
+          password => {
+            val (currentPassword, newPassword) = password
+            val credentials                    = Credentials(request.identity.email.getOrElse(""), currentPassword)
+            credentialsProvider
+              .authenticate(credentials)
+              .flatMap { loginInfo =>
+                val passwordInfo = passwordHasherRegistry.current.hash(newPassword)
+                authInfoRepository.update[PasswordInfo](loginInfo, passwordInfo).map { _ =>
+                  Redirect(routes.ChangePasswordController.view())
+                    .flashing("success" -> Messages("password.changed"))
+                }
               }
-            }
-            .recover {
-              case e: ProviderException =>
-                Redirect(routes.ChangePasswordController.view())
-                  .flashing("error" -> Messages("current.password.invalid"))
-            }
-        }
-      )
-  }
+              .recover {
+                case e: ProviderException =>
+                  Redirect(routes.ChangePasswordController.view())
+                    .flashing("error" -> Messages("current.password.invalid"))
+              }
+          }
+        )
+    }
 }
