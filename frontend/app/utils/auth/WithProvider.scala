@@ -17,6 +17,8 @@
 
 package utils.auth
 
+import cats.instances.string._
+import cats.syntax.eq._
 import com.mohiva.play.silhouette.api.{ Authenticator, Authorization }
 import models.User
 import play.api.mvc.Request

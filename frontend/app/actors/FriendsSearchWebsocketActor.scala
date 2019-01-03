@@ -195,9 +195,7 @@ class FriendsSearchWebsocketActor(langs: Langs,
         _ <- friendsDAO.createFriend(Friend(user.userID, uuid, ZonedDateTime.now()))
         _ <- friendsDAO.createFriend(Friend(uuid, user.userID, ZonedDateTime.now()))
       } yield {
-        createMessage("acceptFriendResponse",
-                      "success",
-                      messagesApi("friends.my-requests.success"))
+        createMessage("acceptFriendResponse", "success", messagesApi("friends.my-requests.success"))
       }
     }
   }
@@ -279,9 +277,7 @@ class FriendsSearchWebsocketActor(langs: Langs,
     for {
       result <- uuidOpt.fold(
         Future.successful(
-          createMessage("requestFriendshipResponse",
-                        "danger",
-                        messagesApi("friends.request.error"))
+          createMessage("requestFriendshipResponse", "danger", messagesApi("friends.request.error"))
         )
       ) { uuid =>
         val fr = FriendRequest(user.userID, uuid, ZonedDateTime.now())

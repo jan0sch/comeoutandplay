@@ -1,0 +1,77 @@
+@import com.wegtam.books.comeoutandplay.games.seabattle.adt.Board
+@(gameState: com.wegtam.books.comeoutandplay.games.seabattle.adt.GameState, shipClasses: scala.collection.immutable.Seq[(com.wegtam.books.comeoutandplay.games.seabattle.adt.ShipClass, com.wegtam.books.comeoutandplay.games.seabattle.adt.Orientation)], user: models.User)(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil, assets: AssetsFinder)
+
+@import io.circe.syntax._
+
+@myCss = {
+  <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/seabattle.css")">
+}
+
+@myScripts = {
+  <script type="text/javascript" src="@routes.Assets.versioned("seabattle-client-jsdeps.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.versioned("seabattle-client-fastopt.js")"></script>
+  <script type="text/javascript">
+    var b = @Html(gameState.boards.getOrElse(user.userID, Board.createDefaultBoard).asJson.noSpaces);
+    Preparation.setBoard(JSON.stringify(b));
+    Preparation.runUnsafe(jsRoutes.controllers.SeabattleController.socket("@gameState.gameId").url,
+            "game-board-canvas",
+            "shipyard-ships",
+            "clear-game-board",
+            "game-ready",
+            "messages");
+  </script>
+}
+
+@main(Messages("games.seabattle.game.prepare"), Some(user), customScripts = myScripts, customCss = myCss) {
+  <div class="row">
+    <h3>@messages("games.seabattle.game.prepare")</h3>
+
+    <div id="alertContainer" style="position: absolute; z-index: 9999;">&#160;</div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <div class="panel panel-default">
+        <div class="panel-heading">@messages("games.seabattle.game.board")</div>
+        <div class="panel-body">
+          <canvas style="display: block" id="game-board-canvas" width="255" height="255"></canvas>
+          <div class="game-board-messages" style="margin-top: 10px;">
+            <label for="messages">@messages("games.seabattle.game.board.log")</label>
+            <textarea id="messages" class="form-control" style="resize: none;" disabled="disabled"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">@messages("games.seabattle.game.prepare.tools")</div>
+        <div class="panel-body">
+          <div id="shipyard">
+            <div class="form-group">
+             <button id="clear-game-board" class="btn btn-warning" type="button" data-locale="@messages("games.seabattle.game.prepare.clear.sure")">@messages("games.seabattle.game.prepare.clear")</button>
+            </div>
+            <div class="form-group">
+              <label for="shipyard-ships">@messages("games.seabattle.game.prepare.ships")</label>
+              <select id="shipyard-ships">
+                @for(t <- shipClasses) {
+                  @defining(t._1) { c =>
+                    @defining(t._2) { o =>
+                      <option id="@c-@o" value="@((c, o).asJson.noSpaces)">@messages("games.seabattle.game.prepare.shipyard", c, c.maxShips, o)</option>
+                    }
+                  }
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <button id="game-ready" class="btn btn-success" type="button"
+                data-locale="@messages("games.seabattle.game.prepare.ready.sure")"
+                data-url="@routes.SeabattleController.game(gameState.gameId)"
+                data-game="@gameState.gameId" data-player="@user.userID">@messages("games.seabattle.game.prepare.ready")</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+}

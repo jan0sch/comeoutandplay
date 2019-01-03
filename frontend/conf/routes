@@ -26,9 +26,23 @@ POST        /password/change          controllers.ChangePasswordController.submi
 GET         /account/email/:email     controllers.ActivateAccountController.send(email: String)
 GET         /account/activate/:token  controllers.ActivateAccountController.activate(token: java.util.UUID)
 
+GET         /js-routes                controllers.ApplicationController.javascriptRoutes
+
 # Friends
 GET         /friends                  controllers.FriendsController.index
 GET         /friends/websocket/search controllers.FriendsSearchController.socket
+
+### Games
+GET         /games                    controllers.GamesController.index
+
+# Games - Seabattle
+GET         /games/seabattle          controllers.SeabattleController.index
+POST        /games/seabattle/new      controllers.SeabattleController.create
+POST        /games/seabattle/:id/join controllers.SeabattleController.join(id: java.util.UUID)
+GET         /games/seabattle/:id/play controllers.SeabattleController.game(id: java.util.UUID)
+GET         /games/seabattle/:id/prep controllers.SeabattleController.gamePrepare(id: java.util.UUID)
+POST        /games/seabattle/:id/drop controllers.SeabattleController.destroy(id: java.util.UUID)
+GET         /games/seabattle/ws/:id   controllers.SeabattleController.socket(id: java.util.UUID)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file           controllers.Assets.versioned(path="/public", file: Asset)

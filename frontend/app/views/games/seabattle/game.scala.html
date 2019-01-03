@@ -1,0 +1,60 @@
+@(gameState: com.wegtam.books.comeoutandplay.games.seabattle.adt.GameState, opponentId: java.util.UUID, user: models.User)(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil, assets: AssetsFinder)
+
+@import com.wegtam.books.comeoutandplay.games.seabattle.adt.GameStateOps.syntax._
+@import io.circe.syntax._
+
+@myCss = {
+  <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/seabattle.css")">
+}
+
+@myScripts = {
+  <script type="text/javascript" src="@routes.Assets.versioned("seabattle-client-jsdeps.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.versioned("seabattle-client-fastopt.js")"></script>
+  <script type="text/javascript">
+    var eb = @Html(gameState.getEnemyBoard(opponentId).map(_.asJson.noSpaces).getOrElse("{}"));
+    var mb = @Html(gameState.getBoard(user.userID).map(_.asJson.noSpaces).getOrElse("{}"));
+    Game.setBoard(JSON.stringify(mb));
+    Game.setEnemyBoard(JSON.stringify(eb));
+    Game.runUnsafe(jsRoutes.controllers.SeabattleController.socket("@gameState.gameId").url,
+            "game-board-canvas",
+            "enemy-game-board-canvas",
+            "messages");
+  </script>
+}
+
+@main(Messages("games.seabattle.game.play"), Some(user), customScripts = myScripts, customCss = myCss) {
+  <div class="row">
+    <h3>@messages("games.seabattle.game.play")</h3>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">@messages("games.seabattle.game.enemyBoard")</div>
+        <div class="panel-body">
+          <canvas style="display: block" id="enemy-game-board-canvas" width="255" height="255"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">@messages("games.seabattle.game.board")</div>
+        <div class="panel-body">
+          <canvas style="display: block" id="game-board-canvas" data-game="@gameState.gameId" data-player="@user.userID" width="255" height="255"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">@messages("games.seabattle.game.board.log")</div>
+        <div id="messages-container" class="panel-body">
+          <textarea id="messages" class="form-control" style="resize: none;" disabled="disabled"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+}

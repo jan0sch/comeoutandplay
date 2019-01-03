@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<body>
+  <div id="scalaJsTest"></div>
+  <div class="row">
+    <div id="game-board" style="margin: 10px;">
+      <h3>Your board</h3>
+      <canvas style="display: block" id="game-board-canvas" width="255" height="255"></canvas>
+      <div class="game-board-messages" style="margin-top: 10px;">
+        <label for="messages">Log</label>
+        <textarea id="messages" cols="80" rows="5" disabled="disabled"></textarea>
+      </div>
+    </div>
+    <div id="shipyard">
+      <button id="clear-game-board" type="button">Clear game board!</button>
+      <label for="shipyard-ships">Ships</label>
+      <select id="shipyard-ships">
+      </select>
+    </div>
+    <div id="enemy-game-board" style="margin: 10px;">
+      <h3>The enemy board</h3>
+      <canvas style="display: block" id="enemy-game-board-canvas" width="255" height="255"></canvas>
+    </div>
+  </div>
+  <script type="text/javascript" src="./target/scala-2.12/seabattle-client-jsdeps.js"></script>
+  <script type="text/javascript" src="./target/scala-2.12/seabattle-client-fastopt.js"></script>
+  <script type="text/javascript">TestApp.runUnsafe();</script>
+</body>
+</html>

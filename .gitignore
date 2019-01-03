@@ -1,3 +1,8 @@
+# Bloop
+.bloop/
+# Eclipse
+.classpath
+.project
 # Emacs
 *~
 \#*\#
@@ -48,6 +53,7 @@ project/boot/
 .*.sw[a-z]
 *.un~
 Session.vim
+/tags
 # Windows
 Thumbs.db
 Desktop.ini
