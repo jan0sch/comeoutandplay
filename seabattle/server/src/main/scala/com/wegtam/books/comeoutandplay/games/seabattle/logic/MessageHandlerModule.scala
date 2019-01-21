@@ -36,8 +36,12 @@ object MessageHandlerModule extends MessageHandler[Id] {
           val gameId = UUID.randomUUID()
           (GameState.createEmpty(gameId)(ownerId), GameInitialised(gameId, ownerId))
         case RegisterPlayer(gs.gameId, playerId) =>
-          (gs.copy(opponent = Option(playerId), running = true),
-           PlayerRegistered(gs.gameId, playerId))
+          gs.opponent match {
+            case None =>
+              (gs.copy(opponent = Option(playerId), running = true),
+               PlayerRegistered(gs.gameId, playerId))
+            case Some(_) => (gs, GameError("The game is already full!"))
+          }
         case CreateBoard(gs.gameId, playerId) =>
           if (gs.owner === playerId || gs.opponent.contains(playerId)) {
             val b = Board.createDefaultBoard
