@@ -30,17 +30,34 @@ import scala.collection.immutable.Seq
 
 class MessageHandlerModuleTest extends WordSpec with MustMatchers with PropertyChecks {
 
-  "Registering a player on an empty GameState" must {
-    "work" in {
-      val gameId            = UUID.randomUUID()
-      val owner             = UUID.randomUUID()
-      val player            = UUID.randomUUID()
-      val gs                = GameState.createEmpty(gameId)(owner)
-      val msg               = Message.RegisterPlayer(gameId, player)
-      val (newGs, response) = MessageHandlerModule.handle(msg).run(gs).value
-      response must be(Message.PlayerRegistered(gameId, player))
-      newGs.opponent must contain(player)
-      newGs.running must be(true)
+  "Registering a player" when {
+    "GameState opponent is empty" must {
+      "return a PlayerRegistered and the correct GameState" in {
+        val gameId            = UUID.randomUUID()
+        val owner             = UUID.randomUUID()
+        val player            = UUID.randomUUID()
+        val gs                = GameState.createEmpty(gameId)(owner)
+        val msg               = Message.RegisterPlayer(gameId, player)
+        val (newGs, response) = MessageHandlerModule.handle(msg).run(gs).value
+        response must be(Message.PlayerRegistered(gameId, player))
+        newGs.opponent must contain(player)
+        newGs.running must be(true)
+      }
+    }
+
+    "GameState opponent is not empty" must {
+      "return a GameError and the unmodified GameState" in {
+        val gameId = UUID.randomUUID()
+        val owner  = UUID.randomUUID()
+        val player = UUID.randomUUID()
+        val gs = GameState
+          .createEmpty(gameId)(owner)
+          .copy(opponent = Option(UUID.randomUUID()), running = true)
+        val msg               = Message.RegisterPlayer(gameId, player)
+        val (newGs, response) = MessageHandlerModule.handle(msg).run(gs).value
+        response must be(Message.GameError("The game is already full!"))
+        newGs must be(gs)
+      }
     }
   }
 
