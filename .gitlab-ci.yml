@@ -6,7 +6,7 @@ before_script:
   ## Install NodeJS
   - apt-get install curl -y
   - curl -sSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
-  - echo "deb https://deb.nodesource.com/node_11.x $(lsb_release -s -c) main" > /etc/apt/sources.list.d/nodesource.list
+  - echo "deb https://deb.nodesource.com/node_11.x jessie main" > /etc/apt/sources.list.d/nodesource.list
   - apt-get update -y
   - apt-get install nodejs -y
   ## Install SBT
