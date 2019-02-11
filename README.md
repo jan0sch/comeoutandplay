@@ -1,5 +1,7 @@
 # Come out and Play - source code for the book
 
+[![pipeline status](https://gitlab.com/comeoutandplay/code/badges/master/pipeline.svg)](https://gitlab.com/comeoutandplay/code/commits/master)
+
 This repository contains the example application that is developed in 
 the book [Come out and Play](https://leanpub.com/comeoutandplay).
 
