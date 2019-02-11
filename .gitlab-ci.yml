@@ -1,0 +1,15 @@
+cache:
+  paths:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot
+
+variables:
+  SBT_OPTS: "-Xms1g -Xmx1g -XX:MaxMetaspaceSize=1g"
+
+stages:
+  - test
+
+test:
+  stage: test
+  script: sbt clean test
+
