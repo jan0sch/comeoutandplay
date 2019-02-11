@@ -41,6 +41,8 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+# Metals
+.metals/
 # SBT
 target/
 lib_managed/
